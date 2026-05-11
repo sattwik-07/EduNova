@@ -1,0 +1,1882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EduNova v3 — Automated</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --sidebar:#0f172a;--sidebar-border:#1e293b;--sidebar-text:#94a3b8;
+  --bg:#f8fafc;--surface:#ffffff;--border:#e2e8f0;
+  --primary:#2563eb;--primary-h:#1d4ed8;--primary-lt:#eff6ff;
+  --text:#0f172a;--muted:#64748b;--success:#16a34a;--danger:#dc2626;
+  --accent:#0ea5e9;--accent-lt:#f0f9ff;--purple:#7c3aed;--purple-lt:#f5f3ff;
+  --orange:#ea580c;--orange-lt:#fff7ed;
+  --warn-bg:#fffbeb;--warn-border:#fbbf24;--warn-text:#92400e;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{font-family:'Source Serif 4',serif;background:var(--bg);color:var(--text);}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+@keyframes liveBlink{0%,100%{background:#ef4444;}50%{background:#fca5a5;}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:none;}}
+.hidden{display:none!important;}
+.fade-in{animation:fadeIn .25s ease forwards;}
+
+/* ── LOADING SCREEN ── */
+@keyframes loaderPulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.08);opacity:.85;}}
+@keyframes loaderBarFill{from{width:0%;}to{width:100%;}}
+@keyframes loaderFadeOut{0%{opacity:1;visibility:visible;}100%{opacity:0;visibility:hidden;}}
+@keyframes dotBounce{0%,80%,100%{transform:translateY(0);}40%{transform:translateY(-10px);}}
+@keyframes loaderRingRotate{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+
+#loader-screen{
+  position:fixed;inset:0;z-index:99999;
+  background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 60%,#0f172a 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0;
+}
+#loader-screen.fade-out{animation:loaderFadeOut .6s ease forwards;}
+.loader-logo{
+  font-family:'Outfit',sans-serif;font-weight:800;font-size:42px;
+  color:#fff;letter-spacing:-1.5px;margin-bottom:8px;
+  animation:loaderPulse 2s ease-in-out infinite;
+}
+.loader-logo span{color:#60a5fa;}
+.loader-tagline{
+  font-family:'Source Serif 4',serif;color:#94a3b8;font-size:14px;
+  margin-bottom:44px;letter-spacing:.3px;
+}
+.loader-ring-wrap{position:relative;width:64px;height:64px;margin-bottom:36px;}
+.loader-ring{
+  width:64px;height:64px;border-radius:50%;
+  border:3px solid rgba(96,165,250,.15);
+  border-top-color:#60a5fa;
+  animation:loaderRingRotate .9s linear infinite;
+  position:absolute;inset:0;
+}
+.loader-ring-inner{
+  width:48px;height:48px;border-radius:50%;
+  border:3px solid rgba(96,165,250,.08);
+  border-bottom-color:#2563eb;
+  animation:loaderRingRotate .6s linear infinite reverse;
+  position:absolute;top:8px;left:8px;
+}
+.loader-bar-track{
+  width:220px;height:4px;background:rgba(255,255,255,.08);
+  border-radius:999px;overflow:hidden;margin-bottom:18px;
+}
+.loader-bar-fill{
+  height:100%;background:linear-gradient(90deg,#2563eb,#60a5fa,#0ea5e9);
+  border-radius:999px;
+  animation:loaderBarFill 1.6s cubic-bezier(.4,0,.2,1) forwards;
+}
+.loader-status{
+  font-family:'Outfit',sans-serif;font-size:12px;
+  color:#475569;letter-spacing:.5px;text-transform:uppercase;
+}
+
+/* AVATAR */
+.avatar{border-radius:50%;color:#fff;font-family:'Outfit',sans-serif;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+/* BADGE */
+.badge{font-family:'Outfit',sans-serif;font-weight:600;font-size:11px;padding:2px 10px;border-radius:999px;display:inline-block;}
+/* BUTTON */
+.btn{font-family:'Outfit',sans-serif;font-weight:600;font-size:14px;border-radius:8px;border:none;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.btn-primary{background:var(--primary);color:#fff;padding:10px 22px;}
+.btn-primary:hover:not(:disabled){background:var(--primary-h);}
+.btn-secondary{background:transparent;color:var(--primary);border:1.5px solid var(--primary);padding:9px 21px;}
+.btn-secondary:hover:not(:disabled){background:var(--primary-lt);}
+.btn-ghost{background:transparent;color:var(--muted);padding:9px 18px;}
+.btn-danger{background:var(--danger);color:#fff;padding:9px 18px;}
+.btn-sm{font-size:13px!important;}
+.btn-sm.btn-primary{padding:6px 14px;}
+.btn-sm.btn-secondary{padding:5px 13px;}
+.btn-sm.btn-ghost{padding:6px 12px;}
+.btn-sm.btn-danger{padding:5px 12px;}
+.btn-full{width:100%;justify-content:center;}
+/* SPINNER */
+.spin{display:inline-block;width:16px;height:16px;border-radius:50%;border:2.5px solid #fff;border-top-color:transparent;animation:spin .7s linear infinite;flex-shrink:0;}
+/* INPUT */
+.field{margin-bottom:16px;}
+.field label{display:block;font-family:'Outfit',sans-serif;font-weight:600;font-size:13px;color:var(--text);margin-bottom:6px;}
+.field input,.field textarea,.field select,input.sa,textarea.sa,select.sa{width:100%;padding:10px 14px;border-radius:8px;border:1.5px solid var(--border);font-family:'Source Serif 4',serif;font-size:14px;color:var(--text);outline:none;background:var(--surface);transition:border-color .15s,box-shadow .15s;}
+.field input:focus,.field textarea:focus,.field select:focus,input.sa:focus,textarea.sa:focus{border-color:var(--primary);box-shadow:0 0 0 3px #2563eb22;}
+textarea.sa{resize:vertical;}
+/* CARD */
+.card{background:var(--surface);border-radius:12px;border:1px solid var(--border);padding:24px;}
+/* TAB */
+.tab-btn{font-family:'Outfit',sans-serif;font-weight:600;font-size:13px;padding:8px 18px;border-radius:8px;border:none;cursor:pointer;transition:all .15s;background:transparent;color:var(--muted);}
+.tab-btn.active{background:var(--primary);color:#fff;}
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:#fff;padding:12px 20px;border-radius:10px;font-family:'Outfit',sans-serif;font-size:13px;z-index:9999;animation:fadeIn .2s ease;}
+.toast.success{background:var(--success);}
+.toast.danger{background:var(--danger);}
+.toast.info{background:var(--primary);}
+/* RENDERED */
+.rendered{font-family:'Source Serif 4',serif;font-size:15px;line-height:1.8;}
+.rendered h1{font-family:'Outfit',sans-serif;font-size:22px;font-weight:700;margin:20px 0 10px;}
+.rendered h2{font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;margin:18px 0 8px;}
+.rendered h3{font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;color:var(--primary);margin:14px 0 6px;}
+.rendered strong{color:var(--text);}
+.rendered ul{padding-left:20px;margin:8px 0;}
+.rendered li{margin:4px 0;padding-left:4px;}
+.rendered .check{color:var(--success);font-weight:700;}
+
+/* ── LOGIN ── */
+#login-page{min-height:100vh;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%);display:flex;align-items:center;justify-content:center;padding:24px;}
+.login-wrap{width:100%;max-width:440px;}
+.brand{text-align:center;margin-bottom:32px;font-family:'Outfit',sans-serif;font-weight:800;font-size:32px;color:#fff;letter-spacing:-1px;}
+.brand span{color:#60a5fa;}
+.brand-sub{color:#94a3b8;font-family:'Source Serif 4',serif;margin-top:6px;font-size:14px;}
+.fill-btns{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;}
+.fill-btn{font-family:'Outfit',sans-serif;font-size:12px;border:none;cursor:pointer;padding:5px 12px;border-radius:6px;}
+.fill-faculty{color:var(--purple);background:var(--purple-lt);}
+.fill-student{color:var(--accent);background:var(--accent-lt);}
+.fill-admin{color:var(--orange);background:var(--orange-lt);}
+.err-msg{color:var(--danger);font-family:'Outfit',sans-serif;font-size:13px;margin-bottom:12px;}
+
+/* ── APP ── */
+#app{display:none;min-height:100vh;}
+#app.visible{display:flex;}
+.sidebar{width:250px;background:var(--sidebar);display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;z-index:50;overflow-y:auto;}
+.sidebar-top{padding:20px 20px 16px;border-bottom:1px solid var(--sidebar-border);}
+.sidebar-logo{font-family:'Outfit',sans-serif;font-weight:800;font-size:22px;color:#fff;letter-spacing:-0.5px;}
+.sidebar-logo span{color:#60a5fa;}
+.sidebar-logo .ver{font-size:10px;color:#475569;margin-left:6px;font-weight:600;}
+.sidebar-user{margin-top:12px;display:flex;align-items:center;gap:10px;}
+.sidebar-user-name{color:#fff;font-family:'Outfit',sans-serif;font-weight:600;font-size:13px;line-height:1.2;}
+.sidebar-nav{flex:1;padding:12px;}
+.nav-section{font-family:'Outfit',sans-serif;font-weight:700;font-size:10px;letter-spacing:1px;color:#475569;padding:8px 12px 4px;text-transform:uppercase;}
+.nav-btn{width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;cursor:pointer;text-align:left;margin-bottom:2px;transition:all .15s;background:transparent;color:var(--sidebar-text);font-family:'Outfit',sans-serif;font-weight:600;font-size:13px;}
+.nav-btn.active{background:rgba(59,130,246,.13);color:#60a5fa;}
+.nav-btn:hover:not(.active){background:rgba(255,255,255,.05);}
+.nav-badge{margin-left:auto;background:#ef4444;color:#fff;font-size:10px;padding:1px 6px;border-radius:999px;font-weight:700;}
+.sidebar-bottom{padding:12px 16px;border-top:1px solid var(--sidebar-border);}
+.api-label{color:var(--sidebar-text);font-family:'Outfit',sans-serif;font-size:11px;margin-bottom:4px;}
+.api-row{display:flex;gap:4px;margin-bottom:8px;}
+.api-input{flex:1;background:var(--sidebar-border);border:none;border-radius:6px;padding:6px 8px;color:#fff;font-family:'JetBrains Mono',monospace;font-size:11px;outline:none;}
+.api-toggle{background:transparent;border:1px solid var(--sidebar-border);color:var(--sidebar-text);border-radius:6px;padding:0 6px;cursor:pointer;font-size:11px;}
+.signout-btn{width:100%;background:transparent;border:1px solid var(--sidebar-border);color:var(--sidebar-text);border-radius:8px;padding:8px;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:600;font-size:12px;transition:all .15s;}
+.signout-btn:hover{background:rgba(255,255,255,.05);color:#fff;}
+.main-content{margin-left:250px;flex:1;background:var(--bg);min-height:100vh;padding:32px;overflow-y:auto;}
+
+/* ── DATA STATUS BAR ── */
+.data-bar{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 18px;margin-bottom:20px;display:flex;align-items:center;gap:16px;font-family:'Outfit',sans-serif;font-size:12px;flex-wrap:wrap;}
+.data-pill{display:flex;align-items:center;gap:6px;color:var(--muted);}
+.data-pill strong{color:var(--text);font-weight:700;}
+.data-pill .dot{width:7px;height:7px;border-radius:50%;}
+.dot-live{background:var(--success);animation:liveBlink 2s infinite;}
+.dot-saved{background:#94a3b8;}
+.save-ts{color:var(--muted);font-size:11px;margin-left:auto;}
+
+/* ── VIEWS ── */
+.view{display:none;animation:fadeIn .2s ease;}
+.view.active{display:block;}
+.view-title{font-family:'Outfit',sans-serif;font-weight:700;font-size:26px;margin-bottom:4px;}
+.view-sub{color:var(--muted);margin-bottom:24px;font-size:15px;}
+.tabs-row{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.tabs-border{border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:20px;}
+.flex-between{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+.empty-state{font-size:15px;color:var(--muted);text-align:center;padding:40px 0;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+
+/* ── CALENDAR ── */
+.calendar-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.cal-nav-btn{background:transparent;border:1.5px solid var(--border);border-radius:8px;padding:6px 14px;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:600;font-size:13px;color:var(--text);transition:all .15s;}
+.cal-nav-btn:hover{background:var(--primary-lt);border-color:var(--primary);}
+.cal-month{font-family:'Outfit',sans-serif;font-weight:700;font-size:20px;flex:1;}
+.cal-view-toggle{display:flex;gap:4px;background:#f1f5f9;border-radius:8px;padding:3px;}
+.cal-view-btn{background:transparent;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:600;font-size:12px;color:var(--muted);transition:all .15s;}
+.cal-view-btn.active{background:#fff;color:var(--primary);box-shadow:0 1px 4px rgba(0,0,0,.08);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border);border-radius:10px;overflow:hidden;border:1px solid var(--border);}
+.cal-day-header{background:var(--surface);padding:8px 4px;text-align:center;font-family:'Outfit',sans-serif;font-weight:700;font-size:11px;color:var(--muted);letter-spacing:.5px;}
+.cal-day{background:var(--surface);min-height:90px;padding:8px;cursor:pointer;transition:background .15s;}
+.cal-day:hover{background:#f8fafc;}
+.cal-day.other-month{background:#fafafa;}
+.cal-day.other-month .cal-date{color:#cbd5e1;}
+.cal-day.today .cal-date-inner{background:var(--primary);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;}
+.cal-date{font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;margin-bottom:4px;color:var(--text);}
+.cal-event{font-size:10px;font-family:'Outfit',sans-serif;font-weight:600;padding:2px 6px;border-radius:4px;margin-bottom:2px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cal-event.lecture{background:#dbeafe;color:#1d4ed8;}
+.cal-event.meeting{background:#d1fae5;color:#065f46;}
+.cal-event.seminar{background:#ede9fe;color:#5b21b6;}
+.cal-event.workshop{background:#ffedd5;color:#9a3412;}
+.cal-event.exam{background:#fee2e2;color:#991b1b;}
+
+/* ── MODALS ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .15s ease;}
+.modal{background:var(--surface);border-radius:16px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+.modal-title{font-family:'Outfit',sans-serif;font-weight:700;font-size:20px;margin-bottom:4px;}
+.modal-sub{color:var(--muted);font-size:13px;margin-bottom:24px;}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);}
+.conflict-warn{background:#fee2e2;border:1px solid #fca5a5;border-radius:8px;padding:12px 16px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--danger);margin-bottom:12px;}
+
+/* ── DATA MANAGEMENT VIEW ── */
+.dm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:28px;}
+.dm-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:20px;transition:all .15s;}
+.dm-card:hover{border-color:var(--primary);}
+.dm-card-icon{font-size:28px;margin-bottom:10px;}
+.dm-card-title{font-family:'Outfit',sans-serif;font-weight:700;font-size:15px;margin-bottom:4px;}
+.dm-card-desc{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.5;}
+.dm-card-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.csv-preview{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.7;max-height:180px;overflow-y:auto;white-space:pre-wrap;margin-top:12px;}
+.import-zone{border:2px dashed var(--border);border-radius:10px;padding:24px;text-align:center;cursor:pointer;transition:all .2s;margin-top:10px;}
+.import-zone:hover{background:var(--primary-lt);border-color:var(--primary);}
+.import-zone-label{font-family:'Outfit',sans-serif;font-weight:600;font-size:14px;margin-bottom:4px;}
+.import-zone-hint{font-size:12px;color:var(--muted);}
+
+/* ── API STATUS ── */
+.api-status-row{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:8px;background:#f8fafc;border:1px solid var(--border);margin-bottom:12px;font-family:'Outfit',sans-serif;font-size:13px;}
+.api-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.api-dot.connected{background:var(--success);}
+.api-dot.disconnected{background:#cbd5e1;}
+.api-dot.testing{background:var(--orange);animation:liveBlink 1s infinite;}
+
+/* ── LIVE ── */
+.live-banner{background:linear-gradient(135deg,#dc2626,#991b1b);border-radius:12px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;gap:16px;color:#fff;}
+.live-dot{width:12px;height:12px;border-radius:50%;animation:liveBlink 1s infinite;flex-shrink:0;}
+.live-stage{background:var(--surface);border-radius:12px;border:1px solid var(--border);overflow:hidden;display:flex;}
+.live-main{flex:1;display:flex;flex-direction:column;}
+.live-screen{background:#0f172a;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;position:relative;}
+.wb-canvas{width:100%;height:100%;cursor:crosshair;}
+.live-controls{display:flex;align-items:center;gap:8px;padding:12px 16px;background:#f8fafc;border-top:1px solid var(--border);flex-wrap:wrap;}
+.ctrl-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:7px 12px;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:600;font-size:12px;display:flex;align-items:center;gap:5px;transition:all .15s;}
+.ctrl-btn:hover{border-color:var(--primary);color:var(--primary);}
+.ctrl-btn.active-ctrl{background:var(--danger);color:#fff;border-color:var(--danger);}
+.live-sidebar{width:270px;flex-shrink:0;display:flex;flex-direction:column;border-left:1px solid var(--border);}
+.live-stab{flex:1;background:transparent;border:none;padding:10px;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:600;font-size:12px;color:var(--muted);transition:all .15s;}
+.live-stab.active{color:var(--primary);border-bottom:2px solid var(--primary);}
+.live-panel{flex:1;overflow-y:auto;padding:12px;min-height:180px;}
+.chat-msg{margin-bottom:10px;}
+.chat-name{font-family:'Outfit',sans-serif;font-weight:700;font-size:11px;color:var(--primary);margin-bottom:2px;}
+.chat-text{font-size:13px;line-height:1.5;}
+.chat-input-row{display:flex;gap:6px;padding:10px 12px;border-top:1px solid var(--border);}
+.chat-input{flex:1;border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-family:'Source Serif 4',serif;font-size:13px;outline:none;}
+.chat-input:focus{border-color:var(--primary);}
+.attend-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f1f5f9;}
+.poll-card{background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:8px;}
+.poll-q{font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;margin-bottom:8px;}
+.poll-opt{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.poll-bar{height:6px;background:#e2e8f0;border-radius:3px;flex:1;}
+.poll-fill{height:100%;background:var(--primary);border-radius:3px;transition:width .5s;}
+.poll-pct{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);width:32px;text-align:right;}
+
+/* ── POST-SESSION ── */
+.processing-card{background:linear-gradient(135deg,var(--primary-lt),var(--purple-lt));border:1px solid #c7d2fe;border-radius:12px;padding:24px;margin-bottom:20px;}
+.proc-step{display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(255,255,255,.7);border-radius:8px;margin-top:8px;}
+.proc-icon{font-size:18px;width:28px;text-align:center;flex-shrink:0;}
+.proc-label{font-family:'Outfit',sans-serif;font-weight:600;font-size:14px;}
+.proc-status{margin-left:auto;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;}
+.proc-status.done{color:var(--success);}
+.proc-status.pending{color:var(--muted);}
+.proc-status.running{color:var(--primary);}
+
+/* ── DASHBOARD ── */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:28px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.stat-val{font-family:'Outfit',sans-serif;font-weight:800;font-size:32px;color:var(--text);}
+.stat-label{font-family:'Outfit',sans-serif;font-size:12px;color:var(--muted);font-weight:600;margin-top:2px;}
+.stat-delta{font-size:12px;font-weight:600;margin-top:6px;color:var(--success);}
+.event-card{display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;transition:all .15s;margin-bottom:8px;}
+.event-card:hover{border-color:var(--primary);}
+.event-date-box{width:48px;text-align:center;flex-shrink:0;}
+.event-date-day{font-family:'Outfit',sans-serif;font-weight:800;font-size:22px;color:var(--primary);line-height:1;}
+.event-date-mon{font-family:'Outfit',sans-serif;font-weight:600;font-size:10px;color:var(--muted);text-transform:uppercase;}
+.event-info{flex:1;}
+.event-title{font-family:'Outfit',sans-serif;font-weight:700;font-size:14px;margin-bottom:2px;}
+.event-meta{font-size:12px;color:var(--muted);}
+.rsvp-btn{font-family:'Outfit',sans-serif;font-weight:600;font-size:11px;padding:4px 10px;border-radius:6px;border:1.5px solid var(--border);cursor:pointer;transition:all .15s;background:transparent;color:var(--muted);}
+.rsvp-btn.yes.active{background:#d1fae5;border-color:#16a34a;color:#16a34a;}
+.rsvp-btn.maybe.active{background:#fef3c7;border-color:#d97706;color:#d97706;}
+.rsvp-btn.no.active{background:#fee2e2;border-color:#dc2626;color:#dc2626;}
+.course-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+.course-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;cursor:pointer;transition:all .2s;}
+.course-card:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,.06);}
+.course-icon{width:40px;height:40px;border-radius:10px;background:var(--primary-lt);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px;}
+.course-title{font-family:'Outfit',sans-serif;font-weight:700;font-size:15px;margin-bottom:4px;line-height:1.3;}
+.course-subject{font-size:12px;color:var(--muted);margin-bottom:12px;}
+.course-meta{font-size:11px;color:var(--muted);margin-bottom:10px;}
+.course-badges{display:flex;gap:6px;flex-wrap:wrap;}
+.resource-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
+.resource-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:18px;transition:all .15s;}
+.resource-card:hover{border-color:var(--primary);}
+.resource-icon{font-size:28px;margin-bottom:10px;}
+.resource-name{font-family:'Outfit',sans-serif;font-weight:700;font-size:14px;margin-bottom:4px;}
+.resource-cap{font-size:12px;color:var(--muted);margin-bottom:10px;}
+.notif-item{display:flex;gap:12px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;transition:all .15s;}
+.notif-item.unread{border-left:3px solid var(--primary);background:var(--primary-lt);}
+.notif-icon{font-size:20px;flex-shrink:0;}
+.notif-text{font-size:13px;line-height:1.5;}
+.notif-time{font-family:'Outfit',sans-serif;font-size:11px;color:var(--muted);margin-top:2px;}
+.manage-list{display:flex;flex-direction:column;gap:12px;}
+.manage-card{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+.dropzone{border:2px dashed var(--border);border-radius:10px;padding:40px 20px;text-align:center;cursor:pointer;transition:all .2s;}
+.dropzone:hover,.dropzone.has-file{background:var(--primary-lt);border-color:var(--primary);}
+.dropzone-icon{font-size:36px;margin-bottom:8px;}
+.dropzone-label{font-family:'Outfit',sans-serif;font-weight:600;font-size:15px;margin-bottom:4px;}
+.dropzone-hint{color:var(--muted);font-size:13px;}
+.gen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;}
+.gen-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:20px 16px;text-align:left;cursor:pointer;transition:all .2s;}
+.gen-card:hover:not(:disabled){border-color:var(--primary);transform:translateY(-2px);}
+.gen-card:disabled{opacity:.5;cursor:not-allowed;}
+.gen-card.done{border-color:var(--success);}
+.gen-card-icon{font-size:28px;margin-bottom:8px;}
+.gen-card-label{font-family:'Outfit',sans-serif;font-weight:700;font-size:14px;margin-bottom:4px;}
+.gen-card-desc{font-size:12px;color:var(--muted);}
+.review-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.review-textarea{width:100%;min-height:280px;padding:12px 16px;border-radius:8px;border:1.5px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.7;outline:none;resize:vertical;color:var(--text);transition:border-color .15s;}
+.review-textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px #2563eb22;}
+.transcript-preview{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text);background:var(--bg);padding:10px 14px;border-radius:8px;max-height:80px;overflow:hidden;line-height:1.6;}
+.transcript-label{font-family:'Outfit',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-bottom:6px;}
+.warn-card{border-color:var(--warn-border);background:var(--warn-bg);}
+.warn-text{font-family:'Outfit',sans-serif;font-weight:600;color:var(--warn-text);}
+.back-btn{background:transparent;border:none;cursor:pointer;font-family:'Outfit',sans-serif;color:var(--primary);font-size:13px;margin-bottom:16px;padding:0;}
+.detail-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+.detail-title{font-family:'Outfit',sans-serif;font-weight:700;font-size:24px;margin-bottom:4px;}
+.detail-meta{font-size:13px;color:var(--muted);}
+.doubt-row{display:flex;gap:10px;margin-bottom:16px;}
+.doubt-textarea{flex:1;padding:10px 14px;border-radius:8px;border:1.5px solid var(--border);font-family:'Source Serif 4',serif;font-size:14px;outline:none;resize:none;height:72px;transition:border-color .15s;}
+.doubt-textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px #2563eb22;}
+.ai-answer{background:var(--primary-lt);border:1px solid rgba(37,99,235,.19);border-radius:8px;padding:16px;}
+.ai-label{font-family:'Outfit',sans-serif;font-weight:600;font-size:12px;color:var(--primary);margin-bottom:8px;}
+.search-bar{padding:10px 16px;border-radius:8px;border:1.5px solid var(--border);font-family:'Source Serif 4',serif;font-size:14px;outline:none;width:260px;color:var(--text);transition:border-color .15s;}
+.search-bar:focus{border-color:var(--primary);}
+.archive-item{display:flex;align-items:center;gap:16px;padding:14px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;}
+.archive-item:hover{background:#f8fafc;}
+.archive-item:last-child{border-bottom:none;}
+.attend-bar{height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-top:4px;}
+.attend-fill{height:100%;border-radius:4px;}
+.dept-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.dept-color{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+
+/* ── JSON/CSV TABLE ── */
+.data-table{width:100%;border-collapse:collapse;font-size:13px;}
+.data-table th{background:#f1f5f9;font-family:'Outfit',sans-serif;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;padding:8px 12px;border:1px solid var(--border);text-align:left;color:var(--muted);}
+.data-table td{padding:8px 12px;border:1px solid var(--border);vertical-align:top;color:var(--text);}
+.data-table tr:nth-child(even) td{background:#fafafa;}
+
+/* ── INTEGRATION ── */
+.int-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:18px;margin-bottom:12px;display:flex;align-items:flex-start;gap:14px;}
+.int-logo{font-size:24px;flex-shrink:0;}
+.int-name{font-family:'Outfit',sans-serif;font-weight:700;font-size:14px;margin-bottom:2px;}
+.int-desc{font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5;}
+.int-status{font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;}
+.int-status.active{background:#d1fae5;color:var(--success);}
+.int-status.inactive{background:#f1f5f9;color:var(--muted);}
+.int-status.simulated{background:#fef3c7;color:#d97706;}
+
+@media(max-width:900px){
+  .sidebar{width:200px;}.main-content{margin-left:200px;padding:20px;}
+  .gen-grid{grid-template-columns:1fr;}.review-grid{grid-template-columns:1fr;}
+  .two-col{grid-template-columns:1fr;}.three-col{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ LOADER ══ -->
+<div id="loader-screen">
+  <div class="loader-logo">Edu<span>Nova</span></div>
+  <div class="loader-tagline">Automated College Teaching & Session Platform</div>
+  <div class="loader-ring-wrap">
+    <div class="loader-ring"></div>
+    <div class="loader-ring-inner"></div>
+  </div>
+  <div class="loader-bar-track"><div class="loader-bar-fill"></div></div>
+  <div class="loader-status" id="loader-status">Initialising…</div>
+</div>
+
+<!-- ══ LOGIN ══ -->
+<div id="login-page">
+  <div class="login-wrap">
+    <div class="brand">Edu<span>Nova</span><span style="font-size:13px;color:#60a5fa;margin-left:8px;font-weight:500;vertical-align:middle;">v3</span>
+      <div class="brand-sub">Automated College Teaching & Session Platform</div>
+    </div>
+    <div class="card">
+      <h2 style="font-family:'Outfit',sans-serif;font-weight:700;font-size:20px;margin-bottom:6px;">Sign in</h2>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:20px;">Demo — <b>faculty@edu.com</b>, <b>student@edu.com</b>, or <b>hod@edu.com</b> · pass: <b>demo123</b></p>
+      <div class="field"><label>Email</label><input id="login-email" type="email" placeholder="you@edu.com"/></div>
+      <div class="field"><label>Password</label><input id="login-pass" type="password" placeholder="••••••••"/></div>
+      <div id="login-err" class="err-msg hidden"></div>
+      <button class="btn btn-primary btn-full" id="signin-btn">Sign In →</button>
+      <div class="fill-btns">
+        <button class="fill-btn fill-faculty" onclick="fillCred('faculty@edu.com')">Fill Faculty</button>
+        <button class="fill-btn fill-student" onclick="fillCred('student@edu.com')">Fill Student</button>
+        <button class="fill-btn fill-admin" onclick="fillCred('hod@edu.com')">Fill HOD/Admin</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app">
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="sidebar-logo">Edu<span>Nova</span><span class="ver">v3</span></div>
+      <div class="sidebar-user">
+        <div class="avatar" id="sb-avatar" style="width:34px;height:34px;font-size:12px;"></div>
+        <div><div class="sidebar-user-name" id="sb-name"></div><span class="badge" id="sb-badge"></span></div>
+      </div>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+    <div class="sidebar-bottom">
+      <button class="signout-btn" onclick="signOut()">← Sign Out</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <!-- Data Status Bar (shown everywhere) -->
+    <div class="data-bar" id="data-bar">
+      <div class="data-pill"><div class="dot dot-live"></div><strong id="db-events">—</strong> Events</div>
+      <div class="data-pill"><div class="dot dot-live"></div><strong id="db-lectures">—</strong> Lectures</div>
+      <div class="data-pill"><div class="dot dot-live"></div><strong id="db-students">—</strong> Students</div>
+
+      <div class="save-ts" id="save-ts">Not saved</div>
+    </div>
+
+    <!-- ─── SCHEDULE ─── -->
+    <div class="view" id="view-schedule">
+      <div class="flex-between" style="margin-bottom:20px;">
+        <div><div class="view-title">College Calendar</div><p class="view-sub" style="margin:0;">Manage lectures, meetings, seminars & exams.</p></div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-sm btn-secondary" onclick="exportCalendarCSV()">⬇ Export CSV</button>
+          <button class="btn btn-primary" onclick="openScheduleModal()">＋ Schedule Event</button>
+        </div>
+      </div>
+      <div class="calendar-header">
+        <button class="cal-nav-btn" onclick="calNav(-1)">‹</button>
+        <div class="cal-month" id="cal-month-label"></div>
+        <button class="cal-nav-btn" onclick="calNav(1)">›</button>
+        <div class="cal-view-toggle">
+          <button class="cal-view-btn active" id="cvb-month" onclick="setCalView('month',this)">Month</button>
+          <button class="cal-view-btn" id="cvb-week" onclick="setCalView('week',this)">Week</button>
+        </div>
+      </div>
+      <div id="cal-container"></div>
+    </div>
+
+    <!-- ─── LIVE SESSION ─── -->
+    <div class="view" id="view-live">
+      <div class="view-title">Live Session</div>
+      <p class="view-sub">Browser-based lecture hosting — attendance auto-marked, session auto-processed.</p>
+      <div id="live-pre-join" class="card" style="max-width:540px;">
+        <div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:16px;margin-bottom:8px;">Today's Scheduled Sessions</div>
+        <div id="today-sessions-list" style="margin-bottom:16px;"></div>
+        <button class="btn btn-primary" onclick="startLiveSession(null)">＋ Start Ad-hoc Session</button>
+      </div>
+      <div id="live-room" class="hidden">
+        <div class="live-banner">
+          <div class="live-dot"></div>
+          <div><div style="font-family:'Outfit',sans-serif;font-weight:800;font-size:14px;letter-spacing:.5px;">● LIVE NOW</div>
+            <div id="live-session-name" style="font-size:13px;opacity:.85;margin-top:2px;"></div></div>
+          <div style="margin-left:auto;display:flex;gap:10px;align-items:center;">
+            <span id="live-timer" style="font-family:'JetBrains Mono',monospace;font-size:14px;"></span>
+            <button class="btn btn-sm" style="background:#fff;color:#dc2626;" onclick="endSession()">⬛ End Session</button>
+          </div>
+        </div>
+        <div class="live-stage">
+          <div class="live-main">
+            <div class="live-screen" id="live-screen-area">
+              <div id="screen-content" style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;flex-direction:column;gap:8px;">
+                <div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:18px;color:#60a5fa;">📡 Whiteboard / Screen Share</div>
+                <div style="font-family:'Outfit',sans-serif;font-size:12px;color:#475569;">Use controls below to switch modes</div>
+              </div>
+              <canvas id="wb-canvas" class="wb-canvas hidden"></canvas>
+            </div>
+            <div class="live-controls">
+              <button class="ctrl-btn" id="ctrl-wb" onclick="toggleWhiteboard()">🖊 Whiteboard</button>
+              <button class="ctrl-btn" onclick="toggleScreen()">🖥 Screen</button>
+              <button class="ctrl-btn" id="ctrl-rec" onclick="toggleRecord()">⏺ Record</button>
+              <button class="ctrl-btn" onclick="openPollModal()">📊 Poll</button>
+              <button class="ctrl-btn" onclick="toggleMic()">🎤 Mute</button>
+              <div style="margin-left:auto;font-family:'Outfit',sans-serif;font-size:12px;color:var(--muted);" id="hand-count">✋ 0 raised</div>
+            </div>
+          </div>
+          <div class="live-sidebar">
+            <div style="display:flex;border-bottom:1px solid var(--border);">
+              <button class="live-stab active" onclick="switchLiveSidebar('chat',this)">Chat</button>
+              <button class="live-stab" onclick="switchLiveSidebar('attend',this)">Attend.</button>
+              <button class="live-stab" onclick="switchLiveSidebar('polls',this)">Polls</button>
+            </div>
+            <div id="live-panel-chat" class="live-panel"><div id="chat-msgs"></div></div>
+            <div id="live-panel-attend" class="live-panel hidden"></div>
+            <div id="live-panel-polls" class="live-panel hidden"><div id="polls-list"></div></div>
+            <div class="chat-input-row" id="chat-input-area">
+              <input class="chat-input" id="chat-input" placeholder="Type a message…" onkeydown="if(event.key==='Enter')sendChat()"/>
+              <button class="btn btn-sm btn-primary" onclick="sendChat()">→</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="post-session" class="hidden">
+        <div class="processing-card">
+          <div style="font-family:'Outfit',sans-serif;font-weight:800;font-size:18px;margin-bottom:4px;">🤖 AI Post-Session Processing</div>
+          <div style="color:var(--muted);font-size:13px;">Session ended. AI is generating all resources automatically.</div>
+          <div id="proc-steps" style="margin-top:12px;">
+            <div class="proc-step"><div class="proc-icon">📝</div><div class="proc-label">Transcribing Recording</div><div class="proc-status pending" id="ps-transcribe">Pending</div></div>
+            <div class="proc-step"><div class="proc-icon">📋</div><div class="proc-label">Generating Structured Notes</div><div class="proc-status pending" id="ps-notes">Pending</div></div>
+            <div class="proc-step"><div class="proc-icon">❓</div><div class="proc-label">Creating Auto-Quiz</div><div class="proc-status pending" id="ps-quiz">Pending</div></div>
+            <div class="proc-step"><div class="proc-icon">📌</div><div class="proc-label">Summary &amp; Key Points</div><div class="proc-status pending" id="ps-summary">Pending</div></div>
+            <div class="proc-step"><div class="proc-icon">💾</div><div class="proc-label">Saving to Data Store</div><div class="proc-status pending" id="ps-attach">Pending</div></div>
+          </div>
+        </div>
+        <div id="post-results" class="hidden"></div>
+      </div>
+    </div>
+
+    <!-- ─── UPLOAD ─── -->
+    <div class="view" id="view-upload">
+      <div class="view-title">Upload Lecture</div>
+      <p class="view-sub">Add a lecture via audio upload or paste a transcript.</p>
+      <div class="tabs-row">
+        <button class="tab-btn active" onclick="switchUploadMode('paste',this)">Paste Transcript</button>
+        <button class="tab-btn" onclick="switchUploadMode('audio',this)">Upload Audio/Video</button>
+      </div>
+      <div id="upload-paste" class="card">
+        <div style="font-family:'Outfit',sans-serif;font-weight:600;font-size:14px;margin-bottom:8px;">Lecture Transcript</div>
+        <textarea id="paste-text" class="sa" style="min-height:200px;padding:12px 16px;font-size:14px;line-height:1.7;" placeholder="Paste your lecture script or notes here..."></textarea>
+        <div style="margin-top:12px;"><button class="btn btn-primary" onclick="usePasteTranscript()">Use this transcript →</button></div>
+      </div>
+      <div id="upload-audio" class="card hidden">
+        <div class="dropzone" id="dropzone" onclick="document.getElementById('audio-file').click()">
+          <div class="dropzone-icon">🎙</div>
+          <div class="dropzone-label" id="dropzone-label">Click to upload audio or video</div>
+          <div class="dropzone-hint">MP3, MP4, WAV, M4A, WEBM · max 25MB</div>
+        </div>
+        <input type="file" id="audio-file" accept="audio/*,video/*" style="display:none" onchange="onFileSelect(this)"/>
+        <div style="margin-top:16px;"><button class="btn btn-primary" id="transcribe-btn" onclick="transcribeAudio()">Transcribe with Whisper →</button></div>
+      </div>
+    </div>
+
+    <!-- ─── GENERATE ─── -->
+    <div class="view" id="view-generate">
+      <div class="view-title">Generate Content</div>
+      <p class="view-sub">AI generates notes, quiz, and slides from your lecture transcript.</p>
+      <div class="card warn-card" id="no-transcript-warn" style="margin-bottom:20px;"><div class="warn-text">⚠ No transcript loaded — go to Upload Lecture first.</div></div>
+      <div class="card hidden" id="transcript-preview-card" style="margin-bottom:20px;">
+        <div class="transcript-label" id="transcript-label-text"></div>
+        <div class="transcript-preview" id="transcript-preview-text"></div>
+      </div>
+      <div class="gen-grid">
+        <button class="gen-card" id="gen-notes" onclick="generateContent('notes')">
+          <div class="gen-card-icon">📋</div><div class="gen-card-label">Generate Notes</div><div class="gen-card-desc">Structured study material</div>
+          <div class="hidden" id="ready-notes" style="margin-top:8px;"><span class="badge" style="background:#16a34a18;color:var(--success);border:1px solid #16a34a30;">✓ Ready</span></div>
+        </button>
+        <button class="gen-card" id="gen-quiz" onclick="generateContent('quiz')">
+          <div class="gen-card-icon">❓</div><div class="gen-card-label">Generate Quiz</div><div class="gen-card-desc">MCQs + short answers</div>
+          <div class="hidden" id="ready-quiz" style="margin-top:8px;"><span class="badge" style="background:#16a34a18;color:var(--success);border:1px solid #16a34a30;">✓ Ready</span></div>
+        </button>
+        <button class="gen-card" id="gen-slides" onclick="generateContent('slides')">
+          <div class="gen-card-icon">🖼</div><div class="gen-card-label">Generate Slides</div><div class="gen-card-desc">Slide-by-slide outline</div>
+          <div class="hidden" id="ready-slides" style="margin-top:8px;"><span class="badge" style="background:#16a34a18;color:var(--success);border:1px solid #16a34a30;">✓ Ready</span></div>
+        </button>
+      </div>
+      <div id="gen-previews"></div>
+    </div>
+
+    <!-- ─── REVIEW ─── -->
+    <div class="view" id="view-review">
+      <div class="view-title">Review &amp; Publish</div>
+      <p class="view-sub">Edit AI-generated content before publishing to students.</p>
+      <div class="card" style="margin-bottom:20px;">
+        <div class="review-grid">
+          <div class="field" style="margin-bottom:0;"><label>Lecture Title *</label><input id="review-title" type="text" placeholder="e.g. Introduction to Neural Networks"/></div>
+          <div class="field" style="margin-bottom:0;"><label>Subject / Course Code</label><input id="review-subject" type="text" placeholder="e.g. CS401 — Deep Learning"/></div>
+        </div>
+      </div>
+      <div class="card warn-card" id="no-content-warn"><div class="warn-text">⚠ No AI content generated yet — go to Generate Content first.</div></div>
+      <div class="hidden" id="review-editor">
+        <div class="tabs-row"><div id="review-tabs">
+          <button class="tab-btn active" onclick="switchReviewTab('notes',this)">Notes</button>
+          <button class="tab-btn" onclick="switchReviewTab('quiz',this)">Quiz</button>
+          <button class="tab-btn" onclick="switchReviewTab('slides',this)">Slides</button>
+        </div></div>
+        <textarea class="review-textarea" id="review-textarea" oninput="onReviewEdit(this.value)"></textarea>
+        <div style="margin-top:16px;display:flex;gap:10px;">
+          <button class="btn btn-primary" onclick="publishLecture()">Publish to Students →</button>
+          <span style="font-size:13px;color:var(--muted);align-self:center;">Saves to local data store automatically.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── MANAGE ─── -->
+    <div class="view" id="view-manage">
+      <div class="flex-between" style="margin-bottom:20px;">
+        <div><div class="view-title">My Lectures</div><p class="view-sub" id="manage-sub" style="margin:0;"></p></div>
+        <button class="btn btn-sm btn-secondary" onclick="exportLecturesJSON()">⬇ Export JSON</button>
+      </div>
+      <div class="manage-list" id="manage-list"></div>
+    </div>
+
+    <!-- ─── STUDENT DASHBOARD ─── -->
+    <div class="view" id="view-dashboard">
+      <div class="flex-between" style="margin-bottom:20px;">
+        <div><div class="view-title">My Dashboard</div><p id="student-sub" style="color:var(--muted);font-size:15px;margin:0;"></p></div>
+        <input class="search-bar" placeholder="🔍 Search lectures…" oninput="searchLectures(this.value)"/>
+      </div>
+      <div id="student-upcoming" style="margin-bottom:28px;"></div>
+      <div class="view-title" style="font-size:18px;margin-bottom:16px;">My Courses</div>
+      <div class="course-grid" id="course-grid"></div>
+    </div>
+
+    <!-- ─── LECTURE DETAIL ─── -->
+    <div class="view" id="view-lecture">
+      <button class="back-btn" onclick="backToDashboard()">← Back to courses</button>
+      <div class="detail-header">
+        <div><div class="detail-title" id="lec-title"></div><div class="detail-meta" id="lec-meta"></div></div>
+        <button class="btn btn-sm btn-secondary" onclick="downloadNotes()">⬇ Download Notes</button>
+      </div>
+      <div class="tabs-row tabs-border" id="lec-tabs">
+        <button class="tab-btn active" onclick="switchLecTab('notes',this)">📋 Notes</button>
+        <button class="tab-btn" onclick="switchLecTab('quiz',this)">❓ Quiz</button>
+        <button class="tab-btn" onclick="switchLecTab('slides',this)">🖼 Slides</button>
+        <button class="tab-btn" onclick="switchLecTab('doubt',this)">💬 Ask Doubt</button>
+      </div>
+      <div id="lec-content-notes" class="card lec-panel"><div class="rendered" id="lec-notes-render"></div></div>
+      <div id="lec-content-quiz" class="card lec-panel hidden"><div class="rendered" id="lec-quiz-render"></div></div>
+      <div id="lec-content-slides" class="card lec-panel hidden"><div class="rendered" id="lec-slides-render"></div></div>
+      <div id="lec-content-doubt" class="card lec-panel hidden">
+        <div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:15px;margin-bottom:16px;">Ask a question about this lecture</div>
+        <div class="doubt-row">
+          <textarea class="doubt-textarea" id="doubt-input" placeholder="Type your question here…"></textarea>
+          <button class="btn btn-primary" id="ask-btn" onclick="askDoubt()">Ask →</button>
+        </div>
+        <div id="ai-answer-box" class="ai-answer hidden">
+          <div class="ai-label">AI TEACHING ASSISTANT</div>
+          <div class="rendered" id="ai-answer-render"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── NOTIFICATIONS ─── -->
+    <div class="view" id="view-notifications">
+      <div class="flex-between" style="margin-bottom:20px;">
+        <div><div class="view-title">Notifications</div><p class="view-sub" style="margin:0;">Invites, reminders, and RSVP requests.</p></div>
+        <button class="btn btn-sm btn-ghost" onclick="markAllRead()">Mark all read</button>
+      </div>
+      <div id="notif-list"></div>
+    </div>
+
+    <!-- ─── RESOURCES ─── -->
+    <div class="view" id="view-resources">
+      <div class="flex-between" style="margin-bottom:20px;">
+        <div><div class="view-title">Resource Booking</div><p class="view-sub" style="margin:0;">Book classrooms, labs, and equipment.</p></div>
+        <button class="btn btn-primary" onclick="openResourceModal()">＋ Book Resource</button>
+      </div>
+      <div class="resource-grid" id="resource-grid"></div>
+    </div>
+
+    <!-- ─── ATTENDANCE ─── -->
+    <div class="view" id="view-attendance">
+      <div class="flex-between" style="margin-bottom:20px;">
+        <div><div class="view-title">Attendance Reports</div><p class="view-sub" style="margin:0;">Auto-generated from live sessions and roster imports.</p></div>
+        <button class="btn btn-sm btn-secondary" onclick="exportAttendanceCSV()">⬇ Export CSV</button>
+      </div>
+      <div id="attendance-list"></div>
+    </div>
+
+    <!-- ─── ARCHIVE ─── -->
+    <div class="view" id="view-archive">
+      <div class="flex-between" style="margin-bottom:20px;">
+        <div><div class="view-title">Session Archive</div><p class="view-sub" style="margin:0;">Searchable library of all past lectures and meetings.</p></div>
+        <input class="search-bar" placeholder="🔍 Search archive…" oninput="searchArchive(this.value)"/>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;" id="archive-list"></div>
+    </div>
+
+    <!-- ─── DATA MANAGEMENT ─── -->
+    <div class="view" id="view-data">
+      <div class="view-title">Data Management</div>
+      <p class="view-sub">Import, export, and manage all application data. All changes persist via localStorage.</p>
+
+      <!-- API Integration Status -->
+      <div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:16px;margin-bottom:12px;">API Integrations</div>
+      <div id="integrations-list" style="margin-bottom:28px;"></div>
+
+      <!-- Import / Export cards -->
+      <div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:16px;margin-bottom:12px;">Import Data</div>
+      <div class="dm-grid" id="import-cards"></div>
+
+      <div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:16px;margin-bottom:12px;">Export Data</div>
+      <div class="dm-grid" id="export-cards"></div>
+
+      <!-- Storage Overview -->
+      <div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:16px;margin-bottom:12px;">Storage Overview</div>
+      <div class="card" id="storage-overview"></div>
+
+      <!-- Danger Zone -->
+      <div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:16px;margin-bottom:12px;color:var(--danger);margin-top:28px;">Danger Zone</div>
+      <div class="card" style="border-color:#fca5a5;background:#fff5f5;">
+        <div style="font-family:'Outfit',sans-serif;font-weight:600;font-size:14px;margin-bottom:8px;">Reset All Data</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:16px;">This will clear all events, lectures, notifications and resources from localStorage and reload the seed data. This action cannot be undone.</div>
+        <button class="btn btn-danger btn-sm" onclick="resetAllData()">Reset to Seed Data</button>
+      </div>
+    </div>
+
+    <!-- ─── ADMIN ─── -->
+    <div class="view" id="view-admin">
+      <div class="view-title">Department Overview</div>
+      <p class="view-sub">Full analytics, planning, and management for HOD/Admin.</p>
+      <div class="stat-grid" id="admin-stats"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div class="card">
+          <div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:15px;margin-bottom:16px;">Department Breakdown</div>
+          <div id="dept-breakdown"></div>
+        </div>
+        <div class="card">
+          <div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:15px;margin-bottom:16px;">Upcoming (All Departments)</div>
+          <div id="admin-upcoming"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast hidden" id="toast"></div>
+
+<!-- ══ MODALS ══ -->
+<div id="modal-overlay" class="modal-overlay hidden" onclick="closeModal(event)">
+
+  <!-- Schedule -->
+  <div class="modal" id="modal-schedule" onclick="event.stopPropagation()">
+    <div class="modal-title">Schedule Event</div>
+    <div class="modal-sub">Create a lecture, meeting, seminar, workshop, or exam. Conflicts are auto-detected.</div>
+    <div id="conflict-warn" class="conflict-warn hidden">⚠ Conflict detected: Room or faculty already booked at this time!</div>
+    <div class="two-col">
+      <div class="field" style="grid-column:1/-1;"><label>Event Title *</label><input id="ev-title" type="text" placeholder="e.g. Data Structures – Lecture 12"/></div>
+    </div>
+    <div class="three-col">
+      <div class="field"><label>Type</label><select id="ev-type"><option value="lecture">🎓 Lecture</option><option value="meeting">🤝 Meeting</option><option value="seminar">🎤 Seminar</option><option value="workshop">🔧 Workshop</option><option value="exam">📝 Exam</option></select></div>
+      <div class="field"><label>Date *</label><input id="ev-date" type="date"/></div>
+      <div class="field"><label>Time *</label><input id="ev-time" type="time"/></div>
+    </div>
+    <div class="two-col">
+      <div class="field"><label>Duration (min)</label><input id="ev-duration" type="number" value="60" min="15" step="15"/></div>
+      <div class="field"><label>Venue</label><select id="ev-venue"><option>Room 101</option><option>Room 202</option><option>CS Lab A</option><option>CS Lab B</option><option>Seminar Hall</option><option>Online (Platform)</option><option>Hybrid</option></select></div>
+    </div>
+    <div class="two-col">
+      <div class="field"><label>Department</label><select id="ev-dept"><option>Computer Science</option><option>Electronics</option><option>Mechanical</option><option>Mathematics</option><option>Physics</option></select></div>
+      <div class="field"><label>Course / Batch</label><input id="ev-course" type="text" placeholder="e.g. CS401 – Batch B"/></div>
+    </div>
+    <div class="two-col">
+      <div class="field"><label>Faculty / Host</label><select id="ev-faculty" id="ev-faculty"><option>Dr. Priya Sharma</option><option>Prof. Rajesh Kumar</option><option>Dr. Anita Verma</option><option>Dr. Suresh Patel</option><option>Prof. R. Krishnan</option></select></div>
+      <div class="field"><label>Recurring</label><select id="ev-recur"><option value="none">One-time</option><option value="weekly">Weekly</option><option value="biweekly">Bi-weekly</option><option value="monthly">Monthly</option></select></div>
+    </div>
+    <div class="field"><label>Description / Notes</label><textarea id="ev-desc" style="height:70px;" placeholder="Optional details or agenda…"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEvent()">Save &amp; Notify →</button>
+    </div>
+  </div>
+
+  <!-- Poll -->
+  <div class="modal" id="modal-poll" onclick="event.stopPropagation()" style="max-width:420px;">
+    <div class="modal-title">Launch Poll</div>
+    <div class="modal-sub">Create a quick live poll for session participants.</div>
+    <div class="field"><label>Question</label><input id="poll-q-input" type="text" placeholder="e.g. Which sorting algorithm is fastest?"/></div>
+    <div class="field"><label>Option A</label><input id="poll-a" type="text" placeholder="Option A"/></div>
+    <div class="field"><label>Option B</label><input id="poll-b" type="text" placeholder="Option B"/></div>
+    <div class="field"><label>Option C</label><input id="poll-c" type="text" placeholder="Option C"/></div>
+    <div class="field"><label>Option D</label><input id="poll-d" type="text" placeholder="Option D"/></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button><button class="btn btn-primary" onclick="launchPoll()">Launch →</button></div>
+  </div>
+
+  <!-- Resource -->
+  <div class="modal" id="modal-resource" onclick="event.stopPropagation()" style="max-width:420px;">
+    <div class="modal-title">Book Resource</div>
+    <div class="modal-sub">Reserve a classroom, lab, or equipment.</div>
+    <div class="field"><label>Resource</label><select id="res-name"><option>Room 101 (40 seats)</option><option>Room 202 (60 seats)</option><option>CS Lab A (30 systems)</option><option>CS Lab B (30 systems)</option><option>Seminar Hall (120 seats)</option><option>Projector Unit 1</option><option>Projector Unit 2</option><option>Smart Board</option></select></div>
+    <div class="two-col">
+      <div class="field"><label>Date</label><input id="res-date" type="date"/></div>
+      <div class="field"><label>Time</label><input id="res-time" type="time"/></div>
+    </div>
+    <div class="field"><label>Duration (hours)</label><input id="res-dur" type="number" value="2" min="1" max="8"/></div>
+    <div class="field"><label>Purpose</label><input id="res-purpose" type="text" placeholder="e.g. Practical exam CS301"/></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button><button class="btn btn-primary" onclick="bookResource()">Confirm Booking →</button></div>
+  </div>
+
+  <!-- CSV Import Preview -->
+  <div class="modal" id="modal-csv-preview" onclick="event.stopPropagation()" style="max-width:700px;">
+    <div class="modal-title" id="csv-modal-title">Import Preview</div>
+    <div class="modal-sub" id="csv-modal-sub">Review the data before importing.</div>
+    <div id="csv-preview-table" style="overflow-x:auto;max-height:360px;overflow-y:auto;"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+      <button class="btn btn-primary" id="csv-confirm-btn" onclick="">Confirm Import →</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Hidden file inputs -->
+<input type="file" id="file-import-events" accept=".csv,.json" style="display:none" onchange="handleFileImport(this,'events')"/>
+<input type="file" id="file-import-students" accept=".csv,.json" style="display:none" onchange="handleFileImport(this,'students')"/>
+<input type="file" id="file-import-lectures" accept=".json" style="display:none" onchange="handleFileImport(this,'lectures')"/>
+
+<script>
+// ════════════════════════════════════════════════════════════════════════
+// ██ CONSTANTS & SEED DATA
+// ════════════════════════════════════════════════════════════════════════
+const GROQ_CHAT    = "https://api.groq.com/openai/v1/chat/completions";
+const GROQ_WHISPER = "https://api.groq.com/openai/v1/audio/transcriptions";
+const MODEL        = "llama-3.3-70b-versatile";
+const LS_KEY       = "edunova_v3_data";
+const LS_API_KEY   = "edunova_v3_apikey";
+
+const TODAY       = new Date();
+const todayStr    = TODAY.toISOString().slice(0,10);
+const tomorrowStr = new Date(TODAY.getTime()+86400000).toISOString().slice(0,10);
+
+const DEMO_CREDS = {
+  "faculty@edu.com": { role:"faculty", name:"Dr. Priya Sharma",  password:"demo123", initials:"PS" },
+  "student@edu.com": { role:"student", name:"Arjun Mehta",        password:"demo123", initials:"AM" },
+  "hod@edu.com":     { role:"admin",   name:"Prof. R. Krishnan",  password:"demo123", initials:"RK" },
+};
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const DAYS   = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+// ── Seed data (used only on first load or after reset) ─────────────────
+const SEED = {
+  events: [
+    {id:"e1",title:"Intro to Machine Learning",type:"lecture",date:todayStr,time:"10:00",duration:60,venue:"Room 101",dept:"Computer Science",course:"CS401 – Batch A",faculty:"Dr. Priya Sharma",recur:"weekly",desc:""},
+    {id:"e2",title:"Department Faculty Meeting",type:"meeting",date:todayStr,time:"14:00",duration:45,venue:"Seminar Hall",dept:"Computer Science",course:"",faculty:"Prof. R. Krishnan",recur:"monthly",desc:"Monthly planning meeting"},
+    {id:"e3",title:"Binary Trees & Traversals",type:"lecture",date:tomorrowStr,time:"09:00",duration:60,venue:"Room 202",dept:"Computer Science",course:"CS201 – Batch B",faculty:"Dr. Priya Sharma",recur:"weekly",desc:""},
+    {id:"e4",title:"OS Seminar: Process Scheduling",type:"seminar",date:tomorrowStr,time:"15:00",duration:90,venue:"Seminar Hall",dept:"Computer Science",course:"CS301",faculty:"Prof. Rajesh Kumar",recur:"none",desc:""},
+    {id:"e5",title:"Database Workshop – SQL Tuning",type:"workshop",date:tomorrowStr,time:"11:00",duration:120,venue:"CS Lab A",dept:"Computer Science",course:"CS302",faculty:"Dr. Anita Verma",recur:"none",desc:""},
+  ],
+  lectures: [
+    {id:"s1",title:"Introduction to Machine Learning",subject:"CS401 — Artificial Intelligence",faculty:"Dr. Priya Sharma",date:"May 8, 2025",
+     notes:"# Introduction to Machine Learning\n\n## What is ML?\nMachine Learning is a branch of AI enabling systems to learn from data.\n\n## Core Types\n- **Supervised Learning** — trains on labeled data\n- **Unsupervised Learning** — finds hidden patterns\n- **Reinforcement Learning** — learns via rewards\n\n## Summary\nML underpins modern AI.",
+     quiz:"**Q1.** What does supervised learning require?\nA) Unlabeled data\nB) Labeled training data ✓\nC) A reward signal\nD) No data",
+     slides:"**Slide 1 — Title**\nIntroduction to ML\n\n**Slide 2 — Definition**\n• Subset of AI\n• Systems improve from experience"},
+    {id:"s2",title:"Binary Trees & Traversals",subject:"CS201 — Data Structures",faculty:"Dr. Priya Sharma",date:"May 6, 2025",
+     notes:"# Binary Trees\n\n## Definition\nA binary tree has nodes with at most two children.\n\n## Traversals\n1. **Inorder** (L → Root → R)\n2. **Preorder** (Root → L → R)\n3. **Postorder** (L → R → Root)",
+     quiz:"**Q1.** Max children per node in a binary tree?\nA) 2 ✓",
+     slides:"**Slide 1** Binary Trees\n**Slide 2** • At most 2 children"},
+  ],
+  students: [
+    {id:"st1",name:"Arjun Mehta",email:"student@edu.com",batch:"CS401-A",dept:"Computer Science"},
+    {id:"st2",name:"Priya Singh",email:"priya@edu.com",batch:"CS401-A",dept:"Computer Science"},
+    {id:"st3",name:"Rahul Gupta",email:"rahul@edu.com",batch:"CS201-B",dept:"Computer Science"},
+    {id:"st4",name:"Sneha Joshi",email:"sneha@edu.com",batch:"CS201-B",dept:"Computer Science"},
+    {id:"st5",name:"Aditya Sharma",email:"aditya@edu.com",batch:"CS301",dept:"Computer Science"},
+  ],
+  resources: [
+    {id:"r1",icon:"🏛",name:"Room 101",cap:"40 seats",bookings:[]},
+    {id:"r2",icon:"🏛",name:"Room 202",cap:"60 seats",bookings:[]},
+    {id:"r3",icon:"🖥",name:"CS Lab A",cap:"30 systems",bookings:[]},
+    {id:"r4",icon:"🖥",name:"CS Lab B",cap:"30 systems",bookings:[]},
+    {id:"r5",icon:"🎤",name:"Seminar Hall",cap:"120 seats",bookings:[]},
+    {id:"r6",icon:"📽",name:"Projector Unit 1",cap:"Portable",bookings:[]},
+    {id:"r7",icon:"📽",name:"Projector Unit 2",cap:"Portable",bookings:[]},
+    {id:"r8",icon:"📺",name:"Smart Board",cap:"Hall A",bookings:[]},
+  ],
+  notifications: [
+    {id:"n1",icon:"🎓",text:"You have been invited to \"Intro to ML\" today at 10:00 AM – Room 101.",time:"Today, 8:30 AM",unread:true,rsvp:null,eventId:"e1"},
+    {id:"n2",icon:"🔔",text:"Reminder: \"Binary Trees\" tomorrow at 9:00 AM – Room 202.",time:"Today, 9:00 AM",unread:true,rsvp:null,eventId:"e3"},
+    {id:"n3",icon:"📣",text:"OS Seminar by Prof. Rajesh Kumar scheduled for tomorrow 3:00 PM.",time:"Yesterday, 5:00 PM",unread:false,rsvp:"yes",eventId:"e4"},
+  ],
+  attendance: [],
+  rsvps: {},
+};
+
+// ════════════════════════════════════════════════════════════════════════
+// ██ REACTIVE STATE LAYER — Proxy-based auto-persist + auto-update
+// ════════════════════════════════════════════════════════════════════════
+let _pendingSave = null;
+function scheduleSave() {
+  clearTimeout(_pendingSave);
+  _pendingSave = setTimeout(()=>{ persistData(); updateDataBar(); }, 400);
+}
+
+function createReactive(target, path="") {
+  return new Proxy(target, {
+    set(obj, key, val) {
+      obj[key] = val;
+      if (path==="" && !["user","apiKey","currentView","currentLecture","reviewTab","lecTab",
+          "uploadMode","audioFile","calView","calDate","liveSession","liveTimer",
+          "liveRecording","liveWB","chatMessages","polls","pendingImport"].includes(key)) {
+        scheduleSave();
+      }
+      return true;
+    },
+    get(obj, key) {
+      if (typeof obj[key] === "object" && obj[key] !== null && !Array.isArray(obj[key]) && !(obj[key] instanceof Date)) {
+        return createReactive(obj[key], path+"."+key);
+      }
+      return obj[key];
+    }
+  });
+}
+
+let _rawState = {
+  user: null, apiKey:"",
+  events:[], lectures:[], students:[], resources:[], notifications:[], attendance:[], rsvps:{},
+  transcript:"", generated:{notes:"",quiz:"",slides:""},
+  currentView:"", currentLecture:null,
+  reviewTab:"notes", lecTab:"notes",
+  uploadMode:"paste", audioFile:null,
+  calView:"month", calDate: new Date(),
+  liveSession:null, liveTimer:null,
+  liveRecording:false, liveWB:false,
+  chatMessages:[], polls:[],
+  pendingImport:null,
+};
+let state = createReactive(_rawState);
+
+// ════════════════════════════════════════════════════════════════════════
+// ██ PERSISTENCE — localStorage read/write
+// ════════════════════════════════════════════════════════════════════════
+const PERSIST_KEYS = ["events","lectures","students","resources","notifications","attendance","rsvps"];
+
+function persistData() {
+  const snapshot = {};
+  PERSIST_KEYS.forEach(k => snapshot[k] = _rawState[k]);
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify(snapshot));
+    const now = new Date().toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"});
+    const el = document.getElementById("save-ts");
+    if (el) el.textContent = "Saved " + now;
+  } catch(e) { console.warn("localStorage full:", e); }
+}
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) {
+      const saved = JSON.parse(raw);
+      PERSIST_KEYS.forEach(k => { if (saved[k] !== undefined) _rawState[k] = saved[k]; });
+      return true;
+    }
+  } catch(e) { console.warn("Load error:", e); }
+  return false;
+}
+
+function loadSeed() {
+  PERSIST_KEYS.forEach(k => _rawState[k] = JSON.parse(JSON.stringify(SEED[k] || (k==="rsvps"?{}:[]))));
+}
+
+function resetAllData() {
+  if (!confirm("This will reset ALL data to the original seed. Are you sure?")) return;
+  localStorage.removeItem(LS_KEY);
+  loadSeed();
+  persistData();
+  updateDataBar();
+  showToast("Data reset to seed defaults.", "info");
+  if (state.currentView) onViewShow(state.currentView);
+}
+
+
+
+// ════════════════════════════════════════════════════════════════════════
+// ██ UTILITIES
+// ════════════════════════════════════════════════════════════════════════
+async function groqChat(prompt) {
+  const r = await fetch(GROQ_CHAT,{method:"POST",headers:{Authorization:`Bearer ${state.apiKey}`,"Content-Type":"application/json"},body:JSON.stringify({model:MODEL,messages:[{role:"user",content:prompt}],max_tokens:2000})});
+  if(!r.ok){const e=await r.json();throw new Error(e.error?.message||"Groq error");}
+  return (await r.json()).choices[0].message.content;
+}
+async function groqWhisper(file) {
+  const fd=new FormData(); fd.append("file",file); fd.append("model","whisper-large-v3"); fd.append("response_format","text");
+  const r=await fetch(GROQ_WHISPER,{method:"POST",headers:{Authorization:`Bearer ${state.apiKey}`},body:fd});
+  if(!r.ok){const e=await r.json();throw new Error(e.error?.message||"Whisper error");}
+  return r.text();
+}
+let toastTimer;
+function showToast(msg,type=""){
+  const t=document.getElementById("toast"); t.textContent=msg; t.className="toast"+(type?" "+type:"");
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.add("hidden"),3500);
+}
+function renderMd(text){
+  if(!text)return"";
+  return text.replace(/^# (.+)$/gm,"<h1>$1</h1>").replace(/^## (.+)$/gm,"<h2>$1</h2>").replace(/^### (.+)$/gm,"<h3>$1</h3>")
+    .replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\*(.+?)\*/g,"<em>$1</em>")
+    .replace(/^- (.+)$/gm,"<li>$1</li>").replace(/^(\d+)\. (.+)$/gm,"<li><b>$1.</b> $2</li>")
+    .replace(/(<li[^>]*>[\s\S]*?<\/li>\n?)+/g,m=>`<ul>${m}</ul>`)
+    .replace(/✓/g,'<span class="check">✓</span>').replace(/\n\n/g,"<br/><br/>").replace(/\n/g,"<br/>");
+}
+function setRendered(id,text){document.getElementById(id).innerHTML=renderMd(text);}
+function fmt(d){return d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});}
+function fmtShort(d){return d.toLocaleDateString("en-US",{month:"short",day:"numeric"});}
+function pad(n){return String(n).padStart(2,"0");}
+function uid(){return "x"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function esc(s){return s?String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"):"";}
+
+// ════════════════════════════════════════════════════════════════════════
+// ██ DATA BAR
+// ════════════════════════════════════════════════════════════════════════
+function updateDataBar(){
+  const e=document.getElementById("db-events"); if(e) e.textContent=_rawState.events.length;
+  const l=document.getElementById("db-lectures"); if(l) l.textContent=_rawState.lectures.length;
+  const s=document.getElementById("db-students"); if(s) s.textContent=_rawState.students.length;
+}
+
+
+// ════════════════════════════════════════════════════════════════════════
+// ██ AUTH
+// ════════════════════════════════════════════════════════════════════════
+function fillCred(email){document.getElementById("login-email").value=email;document.getElementById("login-pass").value="demo123";}
+document.getElementById("signin-btn").addEventListener("click",async()=>{
+  const email=document.getElementById("login-email").value.trim();
+  const pass=document.getElementById("login-pass").value;
+  const err=document.getElementById("login-err"),btn=document.getElementById("signin-btn");
+  err.classList.add("hidden"); btn.disabled=true; btn.innerHTML='<span class="spin"></span>Signing in…';
+  await new Promise(r=>setTimeout(r,500));
+  const u=DEMO_CREDS[email];
+  if(!u||u.password!==pass){err.textContent="Invalid credentials.";err.classList.remove("hidden");btn.disabled=false;btn.innerHTML="Sign In →";return;}
+  state.user={email,...u}; loginSuccess();
+});
+["login-email","login-pass"].forEach(id=>document.getElementById(id).addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("signin-btn").click();}));
+
+function loginSuccess(){
+  document.getElementById("login-page").style.display="none";
+  document.getElementById("app").classList.add("visible");
+  setupShell();
+  navigateTo(state.user.role==="faculty"?"upload":state.user.role==="admin"?"admin":"dashboard");
+}
+function signOut(){
+  state.user=null; state.currentLecture=null; state.liveSession=null;
+  if(state.liveTimer)clearInterval(state.liveTimer);
+  document.getElementById("app").classList.remove("visible");
+  document.getElementById("login-page").style.display="";
+  document.getElementById("signin-btn").disabled=false;document.getElementById("signin-btn").innerHTML="Sign In →";
+  document.getElementById("login-email").value="";document.getElementById("login-pass").value="";
+}
+
+
+// ════════════════════════════════════════════════════════════════════════
+// ██ SHELL / NAV
+// ════════════════════════════════════════════════════════════════════════
+function setupShell(){
+  const u=state.user;
+  const av=document.getElementById("sb-avatar");
+  av.textContent=u.initials;
+  av.style.background=u.role==="faculty"?"#7c3aed":u.role==="admin"?"#ea580c":"#0ea5e9";
+  document.getElementById("sb-name").textContent=u.name;
+  const badge=document.getElementById("sb-badge");
+  const rc={faculty:["#a855f7","#a855f718"],student:["#0ea5e9","#0ea5e918"],admin:["#ea580c","#ea580c18"]};
+  const[col,bg]=rc[u.role];
+  badge.textContent=u.role; badge.style.cssText=`background:${bg};color:${col};border:1px solid ${col}30;`;
+  buildNav();
+}
+function buildNav(){
+  const u=state.user;
+  const unread=_rawState.notifications.filter(n=>n.unread).length;
+  const defs={
+    faculty:[
+      {sec:"Sessions"},{id:"schedule",label:"College Calendar",icon:"📅"},{id:"live",label:"Live Session",icon:"🔴"},
+      {sec:"Content"},{id:"upload",label:"Upload Lecture",icon:"⬆"},{id:"generate",label:"Generate Content",icon:"✦"},{id:"review",label:"Review & Publish",icon:"✏"},{id:"manage",label:"My Lectures",icon:"📚"},
+      {sec:"Tools"},{id:"resources",label:"Resource Booking",icon:"🏛"},{id:"attendance",label:"Attendance Reports",icon:"📊"},{id:"archive",label:"Session Archive",icon:"🗂"},{id:"notifications",label:"Notifications",icon:"🔔",badge:unread},{id:"data",label:"Data Management",icon:"⚙"},
+    ],
+    student:[
+      {sec:"Learning"},{id:"dashboard",label:"My Courses",icon:"🏠"},{id:"schedule",label:"My Schedule",icon:"📅"},
+      {sec:"More"},{id:"archive",label:"Past Sessions",icon:"🗂"},{id:"notifications",label:"Notifications",icon:"🔔",badge:unread},
+    ],
+    admin:[
+      {sec:"Admin"},{id:"admin",label:"Department Overview",icon:"📈"},{id:"schedule",label:"Full Calendar",icon:"📅"},
+      {sec:"Tools"},{id:"resources",label:"Resource Management",icon:"🏛"},{id:"attendance",label:"Attendance Reports",icon:"📊"},{id:"archive",label:"Session Archive",icon:"🗂"},{id:"notifications",label:"Notifications",icon:"🔔",badge:unread},{id:"data",label:"Data Management",icon:"⚙"},
+    ],
+  };
+  document.getElementById("sidebar-nav").innerHTML=(defs[u.role]||[]).map(item=>{
+    if(item.sec)return`<div class="nav-section">${item.sec}</div>`;
+    const bdg=item.badge?`<span class="nav-badge">${item.badge}</span>`:"";
+    return`<button class="nav-btn" data-nav="${item.id}" onclick="navigateTo('${item.id}')">${item.icon} ${item.label}${bdg}</button>`;
+  }).join("");
+}
+function navigateTo(id){
+  state.currentView=id;
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.nav===id));
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  const target=document.getElementById("view-"+id);
+  if(target){target.classList.add("active");onViewShow(id);}
+}
+function onViewShow(id){
+  if(id==="schedule")     renderCalendar();
+  if(id==="manage")       renderManage();
+  if(id==="dashboard")    {renderStudentUpcoming();renderDashboard();}
+  if(id==="generate")     updateGenerateView();
+  if(id==="review")       updateReviewView();
+  if(id==="notifications")renderNotifications();
+  if(id==="resources")    renderResources();
+  if(id==="attendance")   renderAttendance();
+  if(id==="archive")      renderArchive("");
+  if(id==="admin")        renderAdmin();
+  if(id==="live")         renderLivePre();
+  if(id==="data")         renderDataManagement();
+  updateDataBar();
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// ██ CALENDAR
+// ════════════════════════════════════════════════════════════════════════
+function calNav(dir){
+  if(state.calView==="month") state.calDate=new Date(state.calDate.getFullYear(),state.calDate.getMonth()+dir,1);
+  else state.calDate=new Date(state.calDate.getTime()+dir*7*86400000);
+  renderCalendar();
+}
+function setCalView(v,btn){
+  state.calView=v;
+  document.querySelectorAll(".cal-view-btn").forEach(b=>b.classList.remove("active")); btn.classList.add("active");
+  renderCalendar();
+}
+function renderCalendar(){
+  const d=state.calDate;
+  document.getElementById("cal-month-label").textContent=state.calView==="month"
+    ?MONTHS[d.getMonth()]+" "+d.getFullYear()
+    :"Week of "+fmtShort(getWeekStart(d));
+  document.getElementById("cal-container").innerHTML=state.calView==="month"?renderMonthGrid(d):renderWeekGrid(d);
+}
+function getEvtsForDate(ds){return _rawState.events.filter(e=>e.date===ds);}
+function ds(y,m,day){return`${y}-${pad(m+1)}-${pad(day)}`;}
+function renderMonthGrid(d){
+  const year=d.getFullYear(),month=d.getMonth();
+  const first=new Date(year,month,1).getDay(),dim=new Date(year,month+1,0).getDate(),diPrev=new Date(year,month,0).getDate();
+  let html='<div class="cal-grid">';
+  DAYS.forEach(x=>html+=`<div class="cal-day-header">${x}</div>`);
+  let day=1,nd=1;
+  for(let i=0;i<42;i++){
+    let dateStr,isOther=false;
+    if(i<first){dateStr=ds(year,month-1,diPrev-first+1+i);isOther=true;}
+    else if(day<=dim){dateStr=ds(year,month,day);}
+    else{dateStr=ds(year,month+1,nd++);isOther=true;}
+    const isToday=dateStr===todayStr;
+    const dn=isOther?(i<first?diPrev-first+1+i:nd-1):day;
+    const evs=getEvtsForDate(dateStr);
+    const evH=evs.slice(0,3).map(e=>`<div class="cal-event ${e.type}" onclick="event.stopPropagation();showEvDetail('${e.id}')" title="${esc(e.title)}">${e.time} ${esc(e.title)}</div>`).join("");
+    const more=evs.length>3?`<div style="font-size:9px;color:var(--muted);font-family:'Outfit',sans-serif;font-weight:600;">+${evs.length-3} more</div>`:"";
+    const dateDisp=isToday?`<div class="cal-date-inner">${dn}</div>`:`${dn}`;
+    html+=`<div class="cal-day${isOther?" other-month":""}${isToday?" today":""}" onclick="openScheduleModal('${dateStr}')"><div class="cal-date">${dateDisp}</div>${evH}${more}</div>`;
+    if(!isOther)day++;
+  }
+  return html+"</div>";
+}
+function getWeekStart(d){const s=new Date(d);s.setDate(s.getDate()-s.getDay());return s;}
+function renderWeekGrid(d){
+  const start=getWeekStart(d);
+  const hours=[];for(let h=7;h<20;h++)hours.push(h);
+  let html='<div style="display:grid;grid-template-columns:60px repeat(7,1fr);gap:1px;background:var(--border);border-radius:10px;overflow:hidden;border:1px solid var(--border);">';
+  html+='<div style="background:var(--surface);"></div>';
+  for(let i=0;i<7;i++){
+    const day=new Date(start);day.setDate(start.getDate()+i);
+    const ds2=day.toISOString().slice(0,10),isT=ds2===todayStr;
+    html+=`<div style="background:var(--surface);padding:8px;text-align:center;border-bottom:1px solid var(--border);${isT?"color:var(--primary);":""}" onclick="openScheduleModal('${ds2}')"><div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:12px;">${DAYS[i]}</div><div style="font-family:'Outfit',sans-serif;font-weight:${isT?800:600};font-size:16px;">${day.getDate()}</div></div>`;
+  }
+  hours.forEach(h=>{
+    html+=`<div style="background:var(--surface);padding:6px 8px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-align:right;border-right:1px solid var(--border);">${pad(h)}:00</div>`;
+    for(let i=0;i<7;i++){
+      const day=new Date(start);day.setDate(start.getDate()+i);
+      const ds2=day.toISOString().slice(0,10);
+      const evs=_rawState.events.filter(e=>e.date===ds2&&parseInt(e.time.split(":")[0])===h);
+      const ec=evs.map(e=>{const[bg,col]=typeColor(e.type);return`<div style="background:${bg};color:${col};border-radius:4px;padding:2px 4px;font-size:10px;font-family:'Outfit',sans-serif;font-weight:600;cursor:pointer;" onclick="showEvDetail('${e.id}')">${esc(e.title)}</div>`;}).join("");
+      html+=`<div style="background:var(--surface);min-height:40px;border-bottom:1px solid #f1f5f9;cursor:pointer;padding:2px;" onclick="openScheduleModal('${ds2}')">${ec}</div>`;
+    }
+  });
+  return html+"</div>";
+}
+function typeColor(type){const m={lecture:["#dbeafe","#1d4ed8"],meeting:["#d1fae5","#065f46"],seminar:["#ede9fe","#5b21b6"],workshop:["#ffedd5","#9a3412"],exam:["#fee2e2","#991b1b"]};return m[type]||["#f1f5f9","#475569"];}
+function showEvDetail(id){
+  const ev=_rawState.events.find(e=>e.id===id);if(!ev)return;
+  const em={lecture:"🎓",meeting:"🤝",seminar:"🎤",workshop:"🔧",exam:"📝"};
+  showToast(`${em[ev.type]||"📌"} ${ev.title} · ${ev.date} ${ev.time} · ${ev.venue}`);
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// ██ SCHEDULE MODAL
+// ════════════════════════════════════════════════════════════════════════
+function openScheduleModal(preDate){
+  document.getElementById("ev-date").value=preDate||todayStr;
+  document.getElementById("ev-title").value="";document.getElementById("ev-desc").value="";
+  document.getElementById("conflict-warn").classList.add("hidden");
+  showModal("modal-schedule");
+}
+function showModal(id){
+  document.getElementById("modal-overlay").classList.remove("hidden");
+  document.querySelectorAll(".modal").forEach(m=>m.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+}
+function closeAllModals(){document.getElementById("modal-overlay").classList.add("hidden");}
+function closeModal(e){if(e.target===document.getElementById("modal-overlay"))closeAllModals();}
+
+function timeToMins(t){const[h,m]=t.split(":").map(Number);return h*60+m;}
+function detectConflict(date,time,duration,venue,faculty,excludeId){
+  const start=timeToMins(time),end=start+parseInt(duration);
+  return _rawState.events.some(ev=>{
+    if(ev.id===excludeId||ev.date!==date)return false;
+    const es=timeToMins(ev.time),ee=es+ev.duration;
+    return start<ee&&end>es&&(ev.venue===venue||ev.faculty===faculty);
+  });
+}
+function saveEvent(){
+  const title=document.getElementById("ev-title").value.trim(); if(!title){showToast("Enter an event title");return;}
+  const date=document.getElementById("ev-date").value,time=document.getElementById("ev-time").value;
+  const duration=parseInt(document.getElementById("ev-duration").value)||60;
+  const venue=document.getElementById("ev-venue").value,faculty=document.getElementById("ev-faculty").value;
+  if(detectConflict(date,time,duration,venue,faculty,null)){document.getElementById("conflict-warn").classList.remove("hidden");return;}
+  const ev={id:uid(),title,type:document.getElementById("ev-type").value,date,time,duration,venue,dept:document.getElementById("ev-dept").value,course:document.getElementById("ev-course").value,faculty,recur:document.getElementById("ev-recur").value,desc:document.getElementById("ev-desc").value};
+  _rawState.events.unshift(ev);
+  // Auto-notify all students
+  _rawState.notifications.unshift({id:uid(),icon:"🎓",text:`New event: "${title}" on ${date} at ${time} – ${venue}.`,time:"Just now",unread:true,rsvp:null,eventId:ev.id});
+  scheduleSave();
+  showToast("Event saved & students notified!","success");
+  closeAllModals(); renderCalendar(); buildNav(); updateDataBar();
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// ██ EXPORT HELPERS
+// ════════════════════════════════════════════════════════════════════════
+function downloadBlob(content,filename,mime){
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([content],{type:mime}));
+  a.download=filename; a.click();
+}
+function exportCalendarCSV(){
+  const headers=["id","title","type","date","time","duration","venue","dept","course","faculty","recur"];
+  const rows=_rawState.events.map(e=>headers.map(h=>JSON.stringify(e[h]||"")).join(","));
+  downloadBlob([headers.join(","),...rows].join("\n"),"edunova_events.csv","text/csv");
+  showToast("Calendar exported as CSV","success");
+}
+function exportLecturesJSON(){
+  downloadBlob(JSON.stringify(_rawState.lectures,null,2),"edunova_lectures.json","application/json");
+  showToast("Lectures exported as JSON","success");
+}
+function exportAttendanceCSV(){
+  const headers=["session","date","student","status","percentage"];
+  const data=_rawState.attendance.length?_rawState.attendance:
+    _rawState.lectures.map(l=>_rawState.students.map(s=>({session:l.title,date:l.date,student:s.name,status:"Present",percentage:Math.floor(Math.random()*30+70)})));
+  const flat=[].concat(...data);
+  const rows=flat.map(r=>headers.map(h=>JSON.stringify(r[h]||"")).join(","));
+  downloadBlob([headers.join(","),...rows].join("\n"),"edunova_attendance.csv","text/csv");
+  showToast("Attendance exported","success");
+}
+function exportStudentsCSV(){
+  const headers=["id","name","email","batch","dept"];
+  const rows=_rawState.students.map(s=>headers.map(h=>JSON.stringify(s[h]||"")).join(","));
+  downloadBlob([headers.join(","),...rows].join("\n"),"edunova_students.csv","text/csv");
+  showToast("Student roster exported","success");
+}
+function exportAllJSON(){
+  const snapshot={};PERSIST_KEYS.forEach(k=>snapshot[k]=_rawState[k]);
+  downloadBlob(JSON.stringify(snapshot,null,2),"edunova_full_export.json","application/json");
+  showToast("Full data export ready","success");
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// ██ CSV / JSON IMPORT
+// ════════════════════════════════════════════════════════════════════════
+function handleFileImport(input,type){
+  const file=input.files[0]; if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const text=e.target.result;
+    if(file.name.endsWith(".json")){importJSON(text,type);}
+    else{importCSV(text,type);}
+  };
+  reader.readAsText(file);
+  input.value="";
+}
+
+function parseCSV(text){
+  const lines=text.trim().split("\n");
+  if(lines.length<2)return[];
+  const headers=lines[0].split(",").map(h=>h.trim().replace(/^"|"$/g,""));
+  return lines.slice(1).map(line=>{
+    const vals=[];let cur="",inQ=false;
+    for(const ch of line){if(ch==='"'){inQ=!inQ;}else if(ch===","&&!inQ){vals.push(cur);cur="";}else{cur+=ch;}}
+    vals.push(cur);
+    const obj={};headers.forEach((h,i)=>obj[h]=(vals[i]||"").trim().replace(/^"|"$/g,""));
+    return obj;
+  });
+}
+
+function importCSV(text,type){
+  const rows=parseCSV(text);
+  if(!rows.length){showToast("No data found in CSV");return;}
+  state.pendingImport={type,rows};
+  // Show preview
+  const headers=Object.keys(rows[0]);
+  const tableHtml=`<table class="data-table"><thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>
+    ${rows.slice(0,20).map(r=>`<tr>${headers.map(h=>`<td>${esc(r[h])}</td>`).join("")}</tr>`).join("")}
+    ${rows.length>20?`<tr><td colspan="${headers.length}" style="text-align:center;color:var(--muted);font-style:italic;">… and ${rows.length-20} more rows</td></tr>`:""}
+  </tbody></table>`;
+  document.getElementById("csv-modal-title").textContent=`Import Preview — ${rows.length} ${type}`;
+  document.getElementById("csv-modal-sub").textContent=`First 20 rows shown. Click Confirm to import all ${rows.length} records.`;
+  document.getElementById("csv-preview-table").innerHTML=tableHtml;
+  document.getElementById("csv-confirm-btn").onclick=confirmImport;
+  showModal("modal-csv-preview");
+}
+
+function importJSON(text,type){
+  try{
+    const data=JSON.parse(text);
+    const arr=Array.isArray(data)?data:(data[type]||[]);
+    if(!arr.length){showToast("No records in JSON");return;}
+    state.pendingImport={type,rows:arr};
+    document.getElementById("csv-modal-title").textContent=`Import Preview — ${arr.length} ${type}`;
+    document.getElementById("csv-modal-sub").textContent=`${arr.length} records will be imported.`;
+    const headers=Object.keys(arr[0]);
+    document.getElementById("csv-preview-table").innerHTML=`<table class="data-table"><thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>
+      ${arr.slice(0,10).map(r=>`<tr>${headers.map(h=>`<td>${esc(String(r[h]||"").slice(0,60))}</td>`).join("")}</tr>`).join("")}
+    </tbody></table>`;
+    document.getElementById("csv-confirm-btn").onclick=confirmImport;
+    showModal("modal-csv-preview");
+  }catch(err){showToast("JSON parse error: "+err.message,"danger");}
+}
+
+function confirmImport(){
+  const{type,rows}=state.pendingImport||{};
+  if(!rows||!type){closeAllModals();return;}
+  if(type==="events"){
+    const mapped=rows.map(r=>({id:r.id||uid(),title:r.title||r.Title||"Untitled",type:(r.type||r.Type||"lecture").toLowerCase(),date:r.date||r.Date||todayStr,time:r.time||r.Time||"09:00",duration:parseInt(r.duration||r.Duration)||60,venue:r.venue||r.Venue||"TBD",dept:r.dept||r.Department||"",course:r.course||r.Course||"",faculty:r.faculty||r.Faculty||"",recur:r.recur||"none",desc:r.description||r.desc||""}));
+    _rawState.events.push(...mapped);
+  }else if(type==="students"){
+    const existing=new Set(_rawState.students.map(s=>s.email));
+    const mapped=rows.filter(r=>(r.email||r.Email)&&!existing.has(r.email||r.Email)).map(r=>({id:r.id||uid(),name:r.name||r.Name||"",email:r.email||r.Email||"",batch:r.batch||r.Batch||"",dept:r.dept||r.Department||"Computer Science"}));
+    _rawState.students.push(...mapped);
+  }else if(type==="lectures"){
+    const mapped=rows.map(r=>({id:r.id||uid(),title:r.title||"Untitled",subject:r.subject||"",faculty:r.faculty||"",date:r.date||fmt(new Date()),notes:r.notes||"",quiz:r.quiz||"",slides:r.slides||""}));
+    _rawState.lectures.push(...mapped);
+  }
+  scheduleSave(); updateDataBar(); buildNav();
+  closeAllModals();
+  showToast(`✅ ${rows.length} ${type} imported successfully!`,"success");
+  state.pendingImport=null;
+  if(state.currentView==="data")renderDataManagement();
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// ██ DATA MANAGEMENT VIEW
+// ════════════════════════════════════════════════════════════════════════
+const INTEGRATIONS=[
+  {logo:"🤖",name:"Groq AI (LLM + Whisper)",desc:"Powers lecture transcription (Whisper), note generation, quiz creation, and the student doubt assistant. Enter your Groq API key in the sidebar.",status:"simulated",statusLabel:"Key Required"},
+  {logo:"📅",name:"Google Calendar API",desc:"Sync college events to Google Calendar so students and faculty receive notifications on all their devices automatically.",status:"inactive",statusLabel:"Not Connected",action:"connectGCal"},
+  {logo:"📧",name:"Email / SMTP",desc:"Send automated invite and reminder emails to students and faculty when new events are scheduled.",status:"simulated",statusLabel:"Simulated"},
+  {logo:"💬",name:"Platform Notifications",desc:"In-app notifications are live. Students receive RSVP invites and 30-minute session reminders automatically.",status:"active",statusLabel:"Active"},
+  {logo:"🗃",name:"SQLite / PostgreSQL",desc:"Replace localStorage with a real database backend for multi-device sync, true persistence, and larger data sets.",status:"inactive",statusLabel:"Not Connected"},
+];
+const IMPORTS=[
+  {icon:"📅",title:"Import Events (CSV)",desc:"Bulk upload lecture/meeting schedule. Required columns: title, type, date (YYYY-MM-DD), time (HH:MM), venue, faculty.",btn:"Browse CSV",input:"file-import-events"},
+  {icon:"👥",title:"Import Student Roster (CSV)",desc:"Upload student list. Required columns: name, email, batch, dept. Duplicates (by email) are automatically skipped.",btn:"Browse CSV",input:"file-import-students"},
+  {icon:"📚",title:"Import Lectures (JSON)",desc:"Import a previously exported lectures.json file to restore or transfer lecture content across instances.",btn:"Browse JSON",input:"file-import-lectures"},
+];
+const EXPORTS_DEF=[
+  {icon:"📅",title:"Export Calendar",desc:"Download all scheduled events as a CSV file compatible with Excel, Google Sheets, or any calendar import tool.",btn:"Download CSV",fn:"exportCalendarCSV"},
+  {icon:"📚",title:"Export Lectures",desc:"Export all published lectures including notes, quiz, and slides as a structured JSON file.",btn:"Download JSON",fn:"exportLecturesJSON"},
+  {icon:"👥",title:"Export Student Roster",desc:"Download the full student list as a CSV.",btn:"Download CSV",fn:"exportStudentsCSV"},
+  {icon:"📊",title:"Export Attendance",desc:"Download attendance records as a CSV report.",btn:"Download CSV",fn:"exportAttendanceCSV"},
+  {icon:"💾",title:"Full Data Export",desc:"Export everything — events, lectures, students, resources, notifications — as a single JSON snapshot.",btn:"Download JSON",fn:"exportAllJSON"},
+];
+
+function renderDataManagement(){
+  // Integrations
+  document.getElementById("integrations-list").innerHTML=INTEGRATIONS.map(i=>`
+    <div class="int-card">
+      <div class="int-logo">${i.logo}</div>
+      <div style="flex:1;">
+        <div class="int-name">${i.name}</div>
+        <div class="int-desc">${i.desc}</div>
+        <span class="int-status ${i.status}">${i.statusLabel}</span>
+        ${i.action?`<button class="btn btn-sm btn-secondary" style="margin-left:10px;" onclick="${i.action}()">${i.name.includes("Google")?"Connect":"Configure"}</button>`:""}
+      </div>
+    </div>`).join("");
+
+  // Import cards
+  document.getElementById("import-cards").innerHTML=IMPORTS.map(c=>`
+    <div class="dm-card">
+      <div class="dm-card-icon">${c.icon}</div>
+      <div class="dm-card-title">${c.title}</div>
+      <div class="dm-card-desc">${c.desc}</div>
+      <div class="dm-card-actions">
+        <button class="btn btn-sm btn-primary" onclick="document.getElementById('${c.input}').click()">⬆ ${c.btn}</button>
+        <button class="btn btn-sm btn-ghost" onclick="showSampleCSV('${c.input}')">View Sample</button>
+      </div>
+    </div>`).join("");
+
+  // Export cards
+  document.getElementById("export-cards").innerHTML=EXPORTS_DEF.map(c=>`
+    <div class="dm-card">
+      <div class="dm-card-icon">${c.icon}</div>
+      <div class="dm-card-title">${c.title}</div>
+      <div class="dm-card-desc">${c.desc}</div>
+      <div class="dm-card-actions"><button class="btn btn-sm btn-secondary" onclick="${c.fn}()">⬇ ${c.btn}</button></div>
+    </div>`).join("");
+
+  // Storage overview
+  const used=JSON.stringify({events:_rawState.events,lectures:_rawState.lectures,students:_rawState.students}).length;
+  const usedKB=(used/1024).toFixed(1);
+  document.getElementById("storage-overview").innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;margin-bottom:16px;">
+      ${[
+        ["Events",_rawState.events.length,"📅"],
+        ["Lectures",_rawState.lectures.length,"📚"],
+        ["Students",_rawState.students.length,"👥"],
+        ["Resources",_rawState.resources.length,"🏛"],
+        ["Notifications",_rawState.notifications.length,"🔔"],
+        ["Storage Used",usedKB+" KB","💾"],
+      ].map(([l,v,ic])=>`<div style="text-align:center;padding:16px;background:#f8fafc;border-radius:10px;border:1px solid var(--border);">
+        <div style="font-size:22px;margin-bottom:6px;">${ic}</div>
+        <div style="font-family:'Outfit',sans-serif;font-weight:800;font-size:22px;">${v}</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;">${l}</div>
+      </div>`).join("")}
+    </div>
+    <div style="font-size:13px;color:var(--muted);">Data is persisted in <code>localStorage</code> under key <code>${LS_KEY}</code>. All form submissions and imports auto-save within 400ms. To connect a real database, replace the <code>persistData()</code> / <code>loadData()</code> functions with API calls to your backend.</div>`;
+}
+
+function showSampleCSV(inputId){
+  const samples={
+    "file-import-events":"title,type,date,time,duration,venue,dept,course,faculty\nAdvanced OS Lecture,lecture,2025-06-01,09:00,60,Room 101,Computer Science,CS501,Dr. Priya Sharma\nProject Review Meeting,meeting,2025-06-02,14:00,45,Seminar Hall,Computer Science,,Prof. R. Krishnan",
+    "file-import-students":"name,email,batch,dept\nSunita Rao,sunita@edu.com,CS401-A,Computer Science\nVikram Nair,vikram@edu.com,CS201-B,Electronics",
+    "file-import-lectures":"[{\"title\":\"Sample Lecture\",\"subject\":\"CS101\",\"faculty\":\"Dr. Smith\",\"date\":\"Jun 1, 2025\",\"notes\":\"## Topic\\nContent here\",\"quiz\":\"Q1. Question?\",\"slides\":\"Slide 1 — Title\"}]",
+  };
+  const s=samples[inputId]||"";
+  document.getElementById("csv-modal-title").textContent="Sample Format";
+  document.getElementById("csv-modal-sub").textContent="Copy this format for your import file.";
+  document.getElementById("csv-preview-table").innerHTML=`<div class="csv-preview">${esc(s)}</div>`;
+  document.getElementById("csv-confirm-btn").style.display="none";
+  showModal("modal-csv-preview");
+  setTimeout(()=>document.getElementById("csv-confirm-btn").style.display="",500);
+}
+
+function connectGCal(){showToast("Google Calendar integration: add a backend OAuth flow and the Google Calendar API SDK to enable this in production.","info");}
+
+// ════════════════════════════════════════════════════════════════════════
+// ██ LIVE SESSION
+// ════════════════════════════════════════════════════════════════════════
+function renderLivePre(){
+  const todayEvs=_rawState.events.filter(e=>e.date===todayStr&&["lecture","meeting","workshop","seminar"].includes(e.type));
+  const list=document.getElementById("today-sessions-list");
+  list.innerHTML=todayEvs.length
+    ?todayEvs.map(e=>`<div class="event-card"><div style="font-size:20px;">${{lecture:"🎓",meeting:"🤝",seminar:"🎤",workshop:"🔧"}[e.type]||"📌"}</div><div class="event-info"><div class="event-title">${esc(e.title)}</div><div class="event-meta">${e.time} · ${e.venue} · ${e.faculty}</div></div><button class="btn btn-sm btn-primary" onclick="startLiveSession('${e.id}')">Join →</button></div>`).join("")
+    :'<div style="color:var(--muted);font-size:14px;margin-bottom:12px;">No sessions today. Start an ad-hoc session below.</div>';
+}
+let liveSeconds=0;
+function startLiveSession(eventId){
+  const ev=eventId?_rawState.events.find(e=>e.id===eventId):null;
+  state.liveSession=ev||{id:"adhoc"+Date.now(),title:"Ad-hoc Session",faculty:state.user.name};
+  document.getElementById("live-session-name").textContent=state.liveSession.title;
+  document.getElementById("live-pre-join").classList.add("hidden");
+  document.getElementById("post-session").classList.add("hidden");
+  document.getElementById("live-room").classList.remove("hidden");
+  state.chatMessages=[{name:"System",text:"Session started. Attendance is being auto-tracked via login."}];
+  renderChat(); renderAttendList();
+  liveSeconds=0;
+  if(state.liveTimer)clearInterval(state.liveTimer);
+  state.liveTimer=setInterval(()=>{
+    liveSeconds++;
+    const h=Math.floor(liveSeconds/3600),m=Math.floor((liveSeconds%3600)/60),s=liveSeconds%60;
+    document.getElementById("live-timer").textContent=h>0?`${pad(h)}:${pad(m)}:${pad(s)}`:`${pad(m)}:${pad(s)}`;
+  },1000);
+  setTimeout(()=>{state.chatMessages.push({name:"Arjun Mehta",text:"Present! Ready for today's session."});state.chatMessages.push({name:"Priya Singh",text:"Here ✋"});renderChat();},2000);
+}
+function endSession(){
+  if(!confirm("End this live session?"))return;
+  clearInterval(state.liveTimer);
+  // Auto-log attendance record
+  const att={id:uid(),session:state.liveSession.title,date:fmt(new Date()),students:_rawState.students.map(s=>({...s,present:Math.random()>.25}))};
+  _rawState.attendance.push(att); scheduleSave();
+  document.getElementById("live-room").classList.add("hidden");
+  document.getElementById("post-session").classList.remove("hidden");
+  runPostSessionProcessing();
+}
+async function runPostSessionProcessing(){
+  const steps=["transcribe","notes","quiz","summary","attach"];
+  for(const step of steps){
+    document.getElementById("ps-"+step).textContent="Running…"; document.getElementById("ps-"+step).className="proc-status running";
+    await new Promise(r=>setTimeout(r,1200));
+    document.getElementById("ps-"+step).textContent="✓ Done"; document.getElementById("ps-"+step).className="proc-status done";
+  }
+  const sessionTitle=state.liveSession?.title||"Live Session";
+  const mockTranscript=`Recorded session: "${sessionTitle}". Faculty explained core concepts with demonstrations.`;
+  let notes="## Session Notes\nTopics covered in this live session.",quiz="**Q1.** What was the main topic?\nA) Option A ✓",slides="**Slide 1** Session Overview";
+  if(state.apiKey){
+    try{
+      [notes,quiz,slides]=await Promise.all([
+        groqChat(`Create brief structured notes with ## headers from: ${mockTranscript}`),
+        groqChat(`Create 3 MCQ questions from: ${mockTranscript}`),
+        groqChat(`Give a 3-sentence summary from: ${mockTranscript}`),
+      ]);
+    }catch(e){console.warn("AI processing skipped:",e.message);}
+  }
+  const lec={id:uid(),title:sessionTitle,subject:"Live Session Recording",faculty:state.user.name,date:fmt(new Date()),notes,quiz,slides};
+  _rawState.lectures.unshift(lec); scheduleSave(); updateDataBar();
+  document.getElementById("post-results").classList.remove("hidden");
+  document.getElementById("post-results").innerHTML=`<div class="card" style="border-color:var(--success);background:#f0fdf4;">
+    <div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:15px;color:var(--success);margin-bottom:8px;">✅ Session processed & saved to data store!</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:16px;">Notes, quiz, and summary are now in the lecture repository. Attendance has been auto-logged.</div>
+    <div style="display:flex;gap:10px;"><button class="btn btn-sm btn-primary" onclick="navigateTo('manage')">View in My Lectures →</button><button class="btn btn-sm btn-ghost" onclick="resetLive()">Start New Session</button></div>
+  </div>`;
+  showToast("Session saved to local data store!","success");
+}
+function resetLive(){
+  document.getElementById("live-pre-join").classList.remove("hidden");
+  document.getElementById("post-session").classList.add("hidden");
+  document.getElementById("live-room").classList.add("hidden");
+  ["transcribe","notes","quiz","summary","attach"].forEach(s=>{document.getElementById("ps-"+s).textContent="Pending";document.getElementById("ps-"+s).className="proc-status pending";});
+  renderLivePre();
+}
+// Chat
+function switchLiveSidebar(tab,btn){
+  document.querySelectorAll(".live-stab").forEach(b=>b.classList.remove("active")); btn.classList.add("active");
+  document.querySelectorAll("[id^='live-panel-']").forEach(p=>p.classList.add("hidden"));
+  document.getElementById("live-panel-"+tab).classList.remove("hidden");
+  document.getElementById("chat-input-area").style.display=tab==="chat"?"":"none";
+}
+function sendChat(){const i=document.getElementById("chat-input"),msg=i.value.trim();if(!msg)return;state.chatMessages.push({name:state.user.name,text:msg});i.value="";renderChat();}
+function renderChat(){const el=document.getElementById("chat-msgs");el.innerHTML=state.chatMessages.map(m=>`<div class="chat-msg"><div class="chat-name">${esc(m.name)}</div><div class="chat-text">${esc(m.text)}</div></div>`).join("");el.scrollTop=el.scrollHeight;}
+function renderAttendList(){
+  document.getElementById("live-panel-attend").innerHTML=_rawState.students.map(s=>`<div class="attend-row"><span style="font-family:'Outfit',sans-serif;font-weight:600;font-size:13px;">${esc(s.name)}</span><span class="badge" style="background:#d1fae5;color:var(--success);border:1px solid #16a34a30;">Present</span></div>`).join("");
+}
+let wbDrawing=false,wbCtx=null;
+function toggleWhiteboard(){
+  const canvas=document.getElementById("wb-canvas"),screen=document.getElementById("screen-content"),btn=document.getElementById("ctrl-wb");
+  state.liveWB=!state.liveWB; canvas.classList.toggle("hidden",!state.liveWB); screen.style.display=state.liveWB?"none":""; btn.classList.toggle("active-ctrl",state.liveWB);
+  if(state.liveWB&&!wbCtx){
+    const area=document.getElementById("live-screen-area"); canvas.width=area.offsetWidth; canvas.height=area.offsetHeight;
+    wbCtx=canvas.getContext("2d"); wbCtx.strokeStyle="#60a5fa"; wbCtx.lineWidth=3; wbCtx.lineCap="round";
+    canvas.addEventListener("mousedown",e=>{wbDrawing=true;wbCtx.beginPath();wbCtx.moveTo(e.offsetX,e.offsetY);});
+    canvas.addEventListener("mousemove",e=>{if(!wbDrawing)return;wbCtx.lineTo(e.offsetX,e.offsetY);wbCtx.stroke();});
+    canvas.addEventListener("mouseup",()=>wbDrawing=false); canvas.addEventListener("mouseleave",()=>wbDrawing=false);
+  }
+}
+function toggleScreen(){showToast("Screen share: browser permission would be requested in production.");}
+function toggleRecord(){state.liveRecording=!state.liveRecording;document.getElementById("ctrl-rec").classList.toggle("active-ctrl",state.liveRecording);showToast(state.liveRecording?"⏺ Recording started":"⏹ Recording stopped");}
+function toggleMic(){showToast("Microphone toggled (simulated).");}
+function openPollModal(){showModal("modal-poll");}
+function launchPoll(){
+  const q=document.getElementById("poll-q-input").value.trim(); if(!q){showToast("Enter a question");return;}
+  const opts=["poll-a","poll-b","poll-c","poll-d"].map(id=>document.getElementById(id).value).filter(Boolean);
+  if(opts.length<2){showToast("Add at least 2 options");return;}
+  const votes=opts.map(()=>Math.floor(Math.random()*15));
+  const total=votes.reduce((a,b)=>a+b,0)||1;
+  state.polls.push({q,opts,votes,total});
+  renderPolls(); closeAllModals(); switchLiveSidebar("polls",document.querySelectorAll(".live-stab")[2]); showToast("Poll launched!");
+}
+function renderPolls(){
+  document.getElementById("polls-list").innerHTML=state.polls.map(p=>`<div class="poll-card"><div class="poll-q">${esc(p.q)}</div>${p.opts.map((o,i)=>`<div class="poll-opt"><div style="font-size:12px;min-width:80px;font-family:'Outfit',sans-serif;font-weight:600;">${esc(o)}</div><div class="poll-bar"><div class="poll-fill" style="width:${Math.round(p.votes[i]/p.total*100)}%"></div></div><div class="poll-pct">${Math.round(p.votes[i]/p.total*100)}%</div></div>`).join("")}</div>`).join("");
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// ██ UPLOAD / GENERATE / REVIEW / MANAGE
+// ════════════════════════════════════════════════════════════════════════
+function switchUploadMode(mode,btn){
+  state.uploadMode=mode;
+  document.querySelectorAll("#view-upload .tab-btn").forEach(b=>b.classList.remove("active")); btn.classList.add("active");
+  document.getElementById("upload-paste").classList.toggle("hidden",mode!=="paste");
+  document.getElementById("upload-audio").classList.toggle("hidden",mode!=="audio");
+}
+function usePasteTranscript(){const t=document.getElementById("paste-text").value.trim();if(!t){showToast("Paste some text first");return;}state.transcript=t;showToast("Transcript loaded — go to Generate Content");}
+function onFileSelect(input){const f=input.files[0];if(!f)return;state.audioFile=f;document.getElementById("dropzone-label").textContent=f.name;document.getElementById("dropzone").classList.add("has-file");}
+async function transcribeAudio(){
+  if(!state.apiKey){showToast("Enter your Groq API key in the sidebar");return;}
+  if(!state.audioFile){showToast("Select an audio/video file");return;}
+  const btn=document.getElementById("transcribe-btn");
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span>Transcribing…';
+  try{state.transcript=await groqWhisper(state.audioFile);showToast("Transcription done! Go to Generate Content");}
+  catch(e){showToast("Error: "+e.message,"danger");}
+  btn.disabled=false;btn.innerHTML="Transcribe with Whisper →";
+}
+function updateGenerateView(){
+  const hasT=!!state.transcript;
+  document.getElementById("no-transcript-warn").classList.toggle("hidden",hasT);
+  document.getElementById("transcript-preview-card").classList.toggle("hidden",!hasT);
+  if(hasT){document.getElementById("transcript-label-text").textContent=`LOADED TRANSCRIPT (${state.transcript.length} chars)`;document.getElementById("transcript-preview-text").textContent=state.transcript.slice(0,200)+"…";}
+  ["notes","quiz","slides"].forEach(k=>{
+    const card=document.getElementById("gen-"+k); card.disabled=!hasT; card.classList.toggle("done",!!state.generated[k]);
+    document.getElementById("ready-"+k).classList.toggle("hidden",!state.generated[k]);
+  });
+  renderGenPreviews();
+}
+async function generateContent(type){
+  if(!state.apiKey){showToast("Enter Groq API key in the sidebar");return;}
+  if(!state.transcript){showToast("No transcript loaded");return;}
+  const card=document.getElementById("gen-"+type),label=card.querySelector(".gen-card-label"),orig=label.textContent;
+  label.innerHTML='<span style="display:inline-block;width:14px;height:14px;border:2px solid var(--primary);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span>Generating…';
+  card.disabled=true;
+  const prompts={
+    notes:`Create comprehensive study notes. Use ## headers, bullet points, bold key terms. Include Key Concepts, Detailed Notes, Summary.\n\n${state.transcript}`,
+    quiz:`Create 5 MCQs with 4 options (mark correct with ✓) and 3 short-answer questions with model answers.\n\n${state.transcript}`,
+    slides:`Create 8-10 slide outlines. Bold each title, then 3-5 bullet points. Include title and summary slides.\n\n${state.transcript}`,
+  };
+  try{state.generated[type]=await groqChat(prompts[type]);showToast(type.charAt(0).toUpperCase()+type.slice(1)+" generated!");updateGenerateView();}
+  catch(e){showToast("Error: "+e.message,"danger");}
+  label.textContent=orig;card.disabled=!state.transcript;
+}
+function renderGenPreviews(){
+  document.getElementById("gen-previews").innerHTML=Object.entries(state.generated).filter(([,v])=>v).map(([k,v])=>`<div class="card" style="margin-bottom:16px;"><div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:14px;margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--primary);">${k}</div><div style="max-height:200px;overflow-y:auto;"><div class="rendered">${renderMd(v)}</div></div></div>`).join("");
+}
+function updateReviewView(){
+  const hasContent=state.generated.notes||state.generated.quiz||state.generated.slides;
+  document.getElementById("no-content-warn").classList.toggle("hidden",!!hasContent);
+  document.getElementById("review-editor").classList.toggle("hidden",!hasContent);
+  if(hasContent)document.getElementById("review-textarea").value=state.generated[state.reviewTab]||"";
+}
+function switchReviewTab(tab,btn){
+  state.reviewTab=tab;
+  document.querySelectorAll("#review-tabs .tab-btn").forEach(b=>b.classList.remove("active")); btn.classList.add("active");
+  document.getElementById("review-textarea").value=state.generated[tab]||"";
+}
+function onReviewEdit(val){state.generated[state.reviewTab]=val;}
+function publishLecture(){
+  const title=document.getElementById("review-title").value.trim(),subject=document.getElementById("review-subject").value.trim();
+  if(!title){showToast("Enter a lecture title");return;}
+  if(!state.generated.notes&&!state.generated.quiz&&!state.generated.slides){showToast("Generate content first");return;}
+  const lec={id:uid(),title,subject,notes:state.generated.notes,quiz:state.generated.quiz,slides:state.generated.slides,faculty:state.user.name,date:fmt(new Date())};
+  _rawState.lectures.unshift(lec); scheduleSave(); updateDataBar();
+  showToast("Published & saved to data store!","success");
+  document.getElementById("review-title").value=""; document.getElementById("review-subject").value="";
+  navigateTo("manage");
+}
+function renderManage(){
+  const n=_rawState.lectures.length;
+  document.getElementById("manage-sub").textContent=`${n} lecture${n!==1?"s":""} published — all persisted in local data store`;
+  const list=document.getElementById("manage-list");
+  if(!n){list.innerHTML='<div class="card"><div class="empty-state">No lectures yet.</div></div>';return;}
+  list.innerHTML=_rawState.lectures.map(l=>`<div class="card manage-card">
+    <div>
+      <div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:16px;">${esc(l.title)}</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:2px;">${esc(l.subject||"")} ${l.subject?"·":""} ${l.date}</div>
+      <div style="margin-top:6px;display:flex;gap:6px;">
+        ${l.notes?`<span class="badge" style="background:#16a34a18;color:var(--success);border:1px solid #16a34a30;">Notes</span>`:""}
+        ${l.quiz?`<span class="badge" style="background:#0ea5e918;color:var(--accent);border:1px solid #0ea5e930;">Quiz</span>`:""}
+        ${l.slides?`<span class="badge" style="background:#7c3aed18;color:var(--purple);border:1px solid #7c3aed30;">Slides</span>`:""}
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <span class="badge" style="background:#16a34a18;color:var(--success);border:1px solid #16a34a30;">Published</span>
+      <button class="btn btn-sm btn-ghost" onclick="deleteLecture('${l.id}')">🗑</button>
+    </div>
+  </div>`).join("");
+}
+function deleteLecture(id){if(!confirm("Delete this lecture?"))return;_rawState.lectures=_rawState.lectures.filter(l=>l.id!==id);scheduleSave();updateDataBar();renderManage();showToast("Deleted");}
+
+// ════════════════════════════════════════════════════════════════════════
+// ██ STUDENT DASHBOARD — dynamically rendered from state
+// ════════════════════════════════════════════════════════════════════════
+function renderStudentUpcoming(){
+  const evs=_rawState.events.filter(e=>e.date>=todayStr).slice(0,4);
+  const el=document.getElementById("student-upcoming");
+  if(!evs.length){el.innerHTML="";return;}
+  el.innerHTML=`<div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:18px;margin-bottom:12px;">Upcoming Sessions</div>`
+    +evs.map(e=>{
+      const rsvp=_rawState.rsvps[e.id]||null;
+      const[mon,day]=e.date.split("-").slice(1);
+      return`<div class="event-card">
+        <div class="event-date-box"><div class="event-date-day">${parseInt(day)}</div><div class="event-date-mon">${MONTHS[parseInt(mon)-1].slice(0,3)}</div></div>
+        <div class="event-info"><div class="event-title">${esc(e.title)}</div><div class="event-meta">${e.time} · ${e.venue} · ${e.faculty}</div></div>
+        <div style="display:flex;gap:6px;">
+          <button class="rsvp-btn yes ${rsvp==="yes"?"active":""}" onclick="setRsvp('${e.id}','yes')">✓</button>
+          <button class="rsvp-btn maybe ${rsvp==="maybe"?"active":""}" onclick="setRsvp('${e.id}','maybe')">?</button>
+          <button class="rsvp-btn no ${rsvp==="no"?"active":""}" onclick="setRsvp('${e.id}','no')">✕</button>
+        </div>
+      </div>`;
+    }).join("");
+}
+function setRsvp(eventId,status){
+  _rawState.rsvps[eventId]=status; scheduleSave();
+  showToast("RSVP: "+{yes:"Will Attend",maybe:"Maybe",no:"Not Attending"}[status]);
+  renderStudentUpcoming();
+}
+function renderDashboard(filter=""){
+  const filtered=_rawState.lectures.filter(l=>!filter||l.title.toLowerCase().includes(filter.toLowerCase())||(l.subject||"").toLowerCase().includes(filter.toLowerCase()));
+  document.getElementById("student-sub").textContent=`Welcome, ${state.user.name.split(" ")[0]}. ${filtered.length} lecture${filtered.length!==1?"s":""} available.`;
+  const grid=document.getElementById("course-grid");
+  if(!filtered.length){grid.innerHTML='<div class="card" style="grid-column:1/-1;"><div class="empty-state">No lectures found.</div></div>';return;}
+  // Dynamic render loop over state array
+  grid.innerHTML=filtered.map(l=>`<div class="course-card" onclick="openLecture('${l.id}')">
+    <div class="course-icon">🎓</div>
+    <div class="course-title">${esc(l.title)}</div>
+    <div class="course-subject">${esc(l.subject||"")}</div>
+    <div class="course-meta">${esc(l.faculty)} · ${l.date}</div>
+    <div class="course-badges">
+      ${l.notes?`<span class="badge" style="background:#16a34a18;color:var(--success);border:1px solid #16a34a30;">Notes</span>`:""}
+      ${l.quiz?`<span class="badge" style="background:#0ea5e918;color:var(--accent);border:1px solid #0ea5e930;">Quiz</span>`:""}
+      ${l.slides?`<span class="badge" style="background:#7c3aed18;color:var(--purple);border:1px solid #7c3aed30;">Slides</span>`:""}
+    </div>
+  </div>`).join("");
+}
+function searchLectures(val){renderDashboard(val);}
+
+function openLecture(id){
+  const lec=_rawState.lectures.find(l=>l.id===id);if(!lec)return;
+  state.currentLecture=lec;
+  document.getElementById("lec-title").textContent=lec.title;
+  document.getElementById("lec-meta").textContent=[lec.subject,lec.faculty,lec.date].filter(Boolean).join(" · ");
+  setRendered("lec-notes-render",lec.notes);setRendered("lec-quiz-render",lec.quiz);setRendered("lec-slides-render",lec.slides);
+  document.getElementById("doubt-input").value="";document.getElementById("ai-answer-box").classList.add("hidden");
+  switchLecTab("notes",document.querySelector("#lec-tabs .tab-btn"));
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  document.getElementById("view-lecture").classList.add("active");
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+}
+function backToDashboard(){document.getElementById("view-lecture").classList.remove("active");document.getElementById("view-dashboard").classList.add("active");document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.nav==="dashboard"));}
+function switchLecTab(tab,btn){
+  state.lecTab=tab;
+  document.querySelectorAll("#lec-tabs .tab-btn").forEach(b=>b.classList.remove("active")); if(btn)btn.classList.add("active");
+  document.querySelectorAll(".lec-panel").forEach(p=>p.classList.add("hidden"));
+  document.getElementById("lec-content-"+tab).classList.remove("hidden");
+}
+async function askDoubt(){
+  const q=document.getElementById("doubt-input").value.trim();if(!q)return;
+  if(!state.apiKey){showToast("Ask your faculty to enter the Groq key");return;}
+  const btn=document.getElementById("ask-btn");btn.disabled=true;btn.innerHTML='<span class="spin"></span>Thinking…';
+  document.getElementById("ai-answer-box").classList.add("hidden");
+  const lec=state.currentLecture;
+  try{
+    const res=await groqChat(`You are a teaching assistant. Answer the student's question based ONLY on this lecture:\n\nLecture: ${lec.title}\nNotes:\n${lec.notes}\nQuiz:\n${lec.quiz}\n\nQuestion: ${q}\n\nProvide a clear, concise answer.`);
+    setRendered("ai-answer-render",res);document.getElementById("ai-answer-box").classList.remove("hidden");
+  }catch(e){showToast("Error: "+e.message,"danger");}
+  btn.disabled=false;btn.innerHTML="Ask →";
+}
+function downloadNotes(){
+  const lec=state.currentLecture,u=state.user;
+  const content=`EduNova v3 — ${lec.title}\nStudent: ${u.name} | Downloaded: ${new Date().toLocaleString()}\n${"─".repeat(60)}\n\n${lec.notes}\n\n${"─".repeat(60)}\nWatermarked for ${u.name} (${u.email})`;
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([content],{type:"text/plain"}));a.download=`${lec.title.replace(/\s+/g,"_")}_notes.txt`;a.click();showToast("Downloaded with watermark");
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// ██ NOTIFICATIONS — auto-generated from events
+// ════════════════════════════════════════════════════════════════════════
+function renderNotifications(){
+  const el=document.getElementById("notif-list");
+  if(!_rawState.notifications.length){el.innerHTML='<div class="card"><div class="empty-state">No notifications.</div></div>';return;}
+  el.innerHTML=_rawState.notifications.map(n=>{
+    const rsvpSect=n.eventId&&!n.rsvp?`<div style="display:flex;gap:6px;margin-top:8px;">
+      <button class="rsvp-btn yes" onclick="rsvpFromNotif('${n.id}','yes')">✓ Will Attend</button>
+      <button class="rsvp-btn maybe" onclick="rsvpFromNotif('${n.id}','maybe')">? Maybe</button>
+      <button class="rsvp-btn no" onclick="rsvpFromNotif('${n.id}','no')">✕ Not Attending</button>
+    </div>`:n.rsvp?`<div style="font-family:'Outfit',sans-serif;font-size:11px;color:var(--muted);margin-top:6px;">RSVP: ${n.rsvp==="yes"?"✅ Will Attend":n.rsvp==="maybe"?"🤔 Maybe":"❌ Not Attending"}</div>`:"";
+    return`<div class="notif-item${n.unread?" unread":""}">
+      <div class="notif-icon">${n.icon}</div>
+      <div style="flex:1;"><div class="notif-text">${esc(n.text)}</div><div class="notif-time">${n.time}</div>${rsvpSect}</div>
+      ${n.unread?`<button style="background:transparent;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:0 4px;" onclick="readNotif('${n.id}')" title="Mark read">·</button>`:""}
+    </div>`;
+  }).join("");
+}
+function rsvpFromNotif(notifId,status){
+  const n=_rawState.notifications.find(n=>n.id===notifId);if(!n)return;
+  n.rsvp=status;n.unread=false;if(n.eventId)_rawState.rsvps[n.eventId]=status;
+  scheduleSave();showToast("RSVP: "+{yes:"Will Attend",maybe:"Maybe",no:"Not Attending"}[status],"success");renderNotifications();
+}
+function readNotif(id){const n=_rawState.notifications.find(n=>n.id===id);if(n){n.unread=false;scheduleSave();}renderNotifications();buildNav();}
+function markAllRead(){_rawState.notifications.forEach(n=>n.unread=false);scheduleSave();renderNotifications();buildNav();}
+
+// ════════════════════════════════════════════════════════════════════════
+// ██ RESOURCES — dynamic render from state array
+// ════════════════════════════════════════════════════════════════════════
+function renderResources(){
+  document.getElementById("resource-grid").innerHTML=_rawState.resources.map(r=>{
+    const busy=r.bookings.some(b=>b.date===todayStr);
+    return`<div class="resource-card">
+      <div class="resource-icon">${r.icon}</div>
+      <div class="resource-name">${esc(r.name)}</div>
+      <div class="resource-cap">${r.cap}</div>
+      <div style="font-family:'Outfit',sans-serif;font-weight:600;font-size:12px;color:${busy?"var(--danger)":"var(--success)"};">${busy?"🔴 Booked Today":"🟢 Available"}</div>
+      ${r.bookings.length?`<div style="margin-top:8px;font-size:11px;color:var(--muted);">${r.bookings.length} booking${r.bookings.length!==1?"s":""}</div>`:""}
+    </div>`;
+  }).join("");
+}
+function openResourceModal(){document.getElementById("res-date").value=todayStr;document.getElementById("res-time").value="09:00";showModal("modal-resource");}
+function bookResource(){
+  const name=document.getElementById("res-name").value,date=document.getElementById("res-date").value,time=document.getElementById("res-time").value,dur=document.getElementById("res-dur").value,purpose=document.getElementById("res-purpose").value;
+  const res=_rawState.resources.find(r=>name.startsWith(r.name.split(" ")[0]));
+  if(res){res.bookings.push({date,time,dur,purpose,bookedBy:state.user.name});scheduleSave();}
+  showToast(`✅ ${name} booked for ${date} at ${time}`,"success");closeAllModals();renderResources();
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// ██ ATTENDANCE — auto-populated from live session records
+// ════════════════════════════════════════════════════════════════════════
+function renderAttendance(){
+  const el=document.getElementById("attendance-list");
+  const sessions=_rawState.lectures.slice(0,8);
+  if(!sessions.length){el.innerHTML='<div class="card"><div class="empty-state">No sessions with attendance data yet. Host a live session to auto-generate records.</div></div>';return;}
+  el.innerHTML=sessions.map(l=>{
+    // Check for real attendance record first, else simulate
+    const rec=_rawState.attendance.find(a=>a.session===l.title);
+    const pct=rec?Math.round(rec.students.filter(s=>s.present).length/Math.max(rec.students.length,1)*100):Math.floor(Math.random()*30+65);
+    const col=pct>=75?"var(--success)":pct>=50?"#d97706":"var(--danger)";
+    return`<div class="card" style="margin-bottom:12px;">
+      <div class="flex-between">
+        <div><div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:15px;">${esc(l.title)}</div><div style="font-size:12px;color:var(--muted);">${esc(l.subject||"")} · ${l.date}${rec?" · Live session":""}</div></div>
+        <div style="text-align:right;"><div style="font-family:'Outfit',sans-serif;font-weight:800;font-size:22px;color:${col};">${pct}%</div><div style="font-size:11px;color:var(--muted);">attendance</div></div>
+      </div>
+      <div class="attend-bar" style="margin-top:12px;"><div class="attend-fill" style="width:${pct}%;background:${col}"></div></div>
+    </div>`;
+  }).join("");
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// ██ ARCHIVE — searchable, dynamic
+// ════════════════════════════════════════════════════════════════════════
+function renderArchive(filter){
+  const filtered=_rawState.lectures.filter(l=>!filter||l.title.toLowerCase().includes(filter.toLowerCase())||(l.subject||"").toLowerCase().includes(filter.toLowerCase()));
+  const el=document.getElementById("archive-list");
+  if(!filtered.length){el.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted);">No sessions found.</div>';return;}
+  el.innerHTML=filtered.map(l=>`<div class="archive-item" onclick="openLecture('${l.id}')">
+    <div style="font-size:22px;">🎓</div>
+    <div style="flex:1;"><div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:14px;">${esc(l.title)}</div><div style="font-size:12px;color:var(--muted);">${esc(l.subject||"")} · ${l.date} · ${esc(l.faculty)}</div></div>
+    <div style="display:flex;gap:6px;">
+      ${l.notes?`<span class="badge" style="background:#16a34a18;color:var(--success);border:1px solid #16a34a30;">Notes</span>`:""}
+      ${l.quiz?`<span class="badge" style="background:#0ea5e918;color:var(--accent);border:1px solid #0ea5e930;">Quiz</span>`:""}
+      ${l.slides?`<span class="badge" style="background:#7c3aed18;color:var(--purple);border:1px solid #7c3aed30;">Slides</span>`:""}
+    </div>
+    <span style="font-size:18px;color:var(--muted);">›</span>
+  </div>`).join("");
+}
+function searchArchive(val){renderArchive(val);}
+
+// ════════════════════════════════════════════════════════════════════════
+// ██ ADMIN / HOD — stats computed dynamically from state
+// ════════════════════════════════════════════════════════════════════════
+function renderAdmin(){
+  document.getElementById("admin-stats").innerHTML=[
+    [_rawState.events.length,"Total Events","↑ auto-scheduled","📅"],
+    [_rawState.lectures.length,"Lectures Published","↑ persistent","📚"],
+    [_rawState.students.length,"Students (Roster)","import CSV to grow","👥"],
+    [_rawState.resources.filter(r=>!r.bookings.some(b=>b.date===todayStr)).length,"Resources Free Today","auto-tracked","🏛"],
+  ].map(([v,l,d,ic])=>`<div class="stat-card"><div style="font-size:22px;margin-bottom:6px;">${ic}</div><div class="stat-val">${v}</div><div class="stat-label">${l}</div><div class="stat-delta">${d}</div></div>`).join("");
+  const depts=["Computer Science","Electronics","Mathematics","Physics","Mechanical"];
+  const colors=["#2563eb","#0ea5e9","#7c3aed","#16a34a","#ea580c"];
+  document.getElementById("dept-breakdown").innerHTML=depts.map((d,i)=>{
+    const count=_rawState.events.filter(e=>e.dept===d).length;
+    return`<div class="dept-row"><div class="dept-color" style="background:${colors[i]};"></div><div style="flex:1;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;">${d}</div><div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:14px;">${count} events</div></div>`;
+  }).join("");
+  const upcoming=_rawState.events.filter(e=>e.date>=todayStr).slice(0,6);
+  document.getElementById("admin-upcoming").innerHTML=upcoming.map(e=>`<div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+    <span style="font-size:16px;">${{lecture:"🎓",meeting:"🤝",seminar:"🎤",workshop:"🔧",exam:"📝"}[e.type]||"📌"}</span>
+    <div style="flex:1;"><div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;">${esc(e.title)}</div><div style="font-size:11px;color:var(--muted);">${e.date} ${e.time} · ${e.dept}</div></div>
+  </div>`).join("")||'<div style="color:var(--muted);font-size:13px;">No upcoming events.</div>';
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// ██ INIT — load data, set up reactive chain
+// ════════════════════════════════════════════════════════════════════════
+(function init(){
+  const loaded=loadData();
+  if(!loaded) loadSeed();
+  updateDataBar();
+
+  // ── Loading screen ──
+  const loaderEl = document.getElementById("loader-screen");
+  const statusEl = document.getElementById("loader-status");
+  const messages = ["Loading data…","Setting up views…","Almost ready…"];
+  let i = 0;
+  const tick = setInterval(()=>{
+    if(i < messages.length){ statusEl.textContent = messages[i++]; }
+  }, 480);
+  setTimeout(()=>{
+    clearInterval(tick);
+    statusEl.textContent = "Ready!";
+    loaderEl.classList.add("fade-out");
+    setTimeout(()=>{ loaderEl.style.display="none"; }, 600);
+  }, 1700);
+})();
+</script>
+</body>
+</html>
