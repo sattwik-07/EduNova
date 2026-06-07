@@ -143,3 +143,11 @@ NODE_ENV=production
 | Faculty | faculty@edu.com | demo123 |
 | Student | student@edu.com | demo123 |
 | Admin/HOD | hod@edu.com | demo123 |
+
+---
+
+---
+
+## 👤 Author
+
+Built by **Sattwik** — [GitHub](https://github.com/sattwik-07)
